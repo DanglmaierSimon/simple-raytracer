@@ -17,7 +17,7 @@ class sphere : public hittable {
     }
 
   public:
-    virtual bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
+    bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
 
     [[nodiscard]] vec3 center() const
     {
