@@ -10,10 +10,10 @@ class lambertian : public material {
     {
     }
 
-    virtual bool scatter(const ray&        r_in,
-                         const hit_record& rec,
-                         vec3&             attenuation,
-                         ray&              scattered) const
+    bool scatter(const ray&        r_in,
+                 const hit_record& rec,
+                 vec3&             attenuation,
+                 ray&              scattered) const override
     {
 
         vec3 scatter_direction = rec.normal + random_unit_vector();

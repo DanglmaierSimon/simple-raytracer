@@ -10,7 +10,10 @@ class dielectric : public material {
     explicit dielectric(double ri)
         : ref_idx{ri} {};
 
-    bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const
+    bool scatter(const ray&        r_in,
+                 const hit_record& rec,
+                 vec3&             attenuation,
+                 ray&              scattered) const override
     {
         attenuation = vec3{1.0, 1.0, 1.0};
         double etai_over_etat;

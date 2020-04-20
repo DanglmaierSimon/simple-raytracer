@@ -26,7 +26,7 @@ class hittable_list : public hittable {
         _objects.push_back(obj);
     }
 
-    virtual bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
+    bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
 
   private:
     std::vector<shared_ptr<hittable>> _objects;
