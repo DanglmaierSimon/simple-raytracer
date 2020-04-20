@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 
 #include "ray.h"
@@ -83,6 +84,7 @@ hittable_list random_scene()
 
 int main()
 {
+    std::ofstream out("image.ppm", std::ios::trunc | std::ios::out);
 
     const int img_width  = 200;
     const int img_height = 100;
@@ -103,7 +105,7 @@ int main()
 
     camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
-    std::cout << "P3\n" << img_width << " " << img_height << "\n255\n";
+    out << "P3\n" << img_width << " " << img_height << "\n255\n";
 
     for (int j = img_height - 1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << " " << std::flush;
@@ -119,7 +121,7 @@ int main()
 
                 color += ray_color(r, world, max_recursion_depth);
             }
-            color.write_color(std::cout, samples_per_pixel);
+            color.write_color(out, samples_per_pixel);
         }
     }
 
