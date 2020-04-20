@@ -12,7 +12,7 @@ class hittable_list : public hittable {
 
   public:
     hittable_list() = default;
-    hittable_list(shared_ptr<hittable> const& obj)
+    explicit hittable_list(shared_ptr<hittable> const& obj)
     {
         add(obj);
     }
