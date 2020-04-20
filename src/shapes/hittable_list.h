@@ -3,10 +3,10 @@
 #include <memory>
 #include <vector>
 
+#include "hittable.h"
+
 using std::make_shared;
 using std::shared_ptr;
-
-#include "hittable.h"
 
 class hittable_list : public hittable {
 
