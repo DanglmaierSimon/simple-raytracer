@@ -3,8 +3,12 @@
 set -o errexit
 set -o pipefail
 
+./build.sh
+
 cd build || exit -1
 
-cmake ..
+rm -f image.ppm
 
-make -j4 raytracer
+./raytracer >>image.ppm
+
+gwenview image.ppm
