@@ -30,7 +30,7 @@ class sphere : public hittable {
 
   private:
     vec3                 _center;
-    double               _radius;
+    double               _radius{0.0};
     shared_ptr<material> _mat_ptr;
 };
 
