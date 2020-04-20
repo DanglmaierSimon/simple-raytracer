@@ -175,7 +175,7 @@ vec3 random_unit_vector()
     return vec3(r * cos(a), r * sin(a), z);
 }
 
-vec3 reflect(vec3 const& v, vec3 const& n)
+constexpr vec3 reflect(vec3 const& v, vec3 const& n)
 {
     return v - 2 * dot(v, n) * n;
 }
