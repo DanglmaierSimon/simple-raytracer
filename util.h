@@ -8,12 +8,10 @@
 #include <random>
 
 // Usings
-
 using std::make_shared;
 using std::shared_ptr;
 
 // Constants
-
 constexpr double infinity = std::numeric_limits<double>::infinity();
 constexpr double pi       = M_PI;
 
