@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "hittable.h"
 #include "vec3.h"
 
@@ -7,10 +9,10 @@ class sphere : public hittable {
 
   public:
     sphere() = default;
-    sphere(vec3 center, double radius, shared_ptr<material> const& m)
+    sphere(vec3 center, double radius, shared_ptr<material> m)
         : _center{center}
         , _radius{radius}
-        , _mat_ptr{m}
+        , _mat_ptr{std::move(m)}
     {
     }
 
