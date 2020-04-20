@@ -148,7 +148,7 @@ constexpr inline vec3 cross(vec3 const& u, vec3 const& v)
     return vec3{u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]};
 }
 
-constexpr inline vec3 unit_vector(vec3 const& v)
+inline vec3 unit_vector(vec3 const& v)
 {
     return v / v.length();
 }
