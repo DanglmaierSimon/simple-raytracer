@@ -17,11 +17,11 @@ class sphere : public hittable {
   public:
     virtual bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
 
-    vec3 center() const
+    [[nodiscard]] vec3 center() const
     {
         return _center;
     }
-    double radius() const
+    [[nodiscard]] double radius() const
     {
         return _radius;
     }

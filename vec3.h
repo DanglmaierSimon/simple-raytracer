@@ -16,15 +16,15 @@ class vec3 {
     {
     }
 
-    constexpr double x() const
+    [[nodiscard]] constexpr double x() const
     {
         return e[0];
     }
-    constexpr double y() const
+    [[nodiscard]] constexpr double y() const
     {
         return e[1];
     }
-    constexpr double z() const
+    [[nodiscard]] constexpr double z() const
     {
         return e[2];
     }
@@ -64,12 +64,12 @@ class vec3 {
         return *this *= 1 / t;
     }
 
-    constexpr double length() const
+    [[nodiscard]] double length() const
     {
         return sqrt(length_squared());
     }
 
-    constexpr double length_squared() const
+    [[nodiscard]] constexpr double length_squared() const
     {
         return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }

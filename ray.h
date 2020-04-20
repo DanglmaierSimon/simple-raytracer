@@ -10,16 +10,16 @@ class ray {
         : _origin{origin}
         , _dir{direction} {};
 
-    constexpr vec3 origin() const
+    [[nodiscard]] constexpr vec3 origin() const
     {
         return _origin;
     }
-    constexpr vec3 direction() const
+    [[nodiscard]] constexpr vec3 direction() const
     {
         return _dir;
     }
 
-    constexpr vec3 at(double t) const
+    [[nodiscard]] constexpr vec3 at(double t) const
     {
         return origin() + t * direction();
     }
