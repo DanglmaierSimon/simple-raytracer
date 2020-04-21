@@ -6,13 +6,16 @@
 
 class material {
   public:
-    virtual bool scatter(const ray&        r_in,
-                         const hit_record& rec,
+    material()          = default;
+    virtual ~material() = default;
+
+    virtual bool scatter(ray const&        r_in,
+                         hit_record const& rec,
                          vec3&             attenuation,
                          ray&              scattered) const = 0;
 };
 
-inline constexpr double schlick(double cosine, double ref_idx)
+constexpr double schlick(double cosine, double ref_idx)
 {
     auto r0 = (1 - ref_idx) / (1 + ref_idx);
     r0      = r0 * r0;

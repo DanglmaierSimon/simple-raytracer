@@ -8,7 +8,6 @@
 class sphere : public hittable {
 
   public:
-    sphere() = default;
     sphere(vec3 center, double radius, shared_ptr<material> m)
         : _center{center}
         , _radius{radius}
@@ -19,11 +18,11 @@ class sphere : public hittable {
   public:
     bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
 
-    [[nodiscard]] vec3 center() const
+    vec3 center() const
     {
         return _center;
     }
-    [[nodiscard]] double radius() const
+    double radius() const
     {
         return _radius;
     }

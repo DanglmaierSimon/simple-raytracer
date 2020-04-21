@@ -5,23 +5,23 @@
 
 class lambertian : public material {
   public:
-    explicit lambertian(vec3 const& a)
-        : albedo{a}
+    explicit constexpr lambertian(vec3 const& a)
+        : _albedo{a}
     {
     }
 
-    bool scatter(const ray&        r_in,
-                 const hit_record& rec,
+    bool scatter(ray const&        r_in,
+                 hit_record const& rec,
                  vec3&             attenuation,
                  ray&              scattered) const override
     {
-
         vec3 scatter_direction = rec.normal + random_unit_vector();
-        scattered              = ray(rec.p, scatter_direction);
-        attenuation            = albedo;
+
+        scattered   = ray(rec.p, scatter_direction);
+        attenuation = _albedo;
         return true;
     }
 
   private:
-    vec3 albedo;
+    vec3 _albedo;
 };
