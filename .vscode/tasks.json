@@ -14,6 +14,12 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": "./run.sh",
+            "problemMatcher": "$gcc"
         }
     ]
 }
