@@ -3,7 +3,7 @@
 set -o errexit
 set -o pipefail
 
-./build.sh
+./build.sh --release
 
 cd build || exit -1
 
