@@ -45,4 +45,4 @@ print_info "Generating image..."
 
 print_success "Image created successfully!"
 
-gwenview image.ppm &
+gwenview image.ppm
