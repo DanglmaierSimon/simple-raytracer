@@ -82,3 +82,8 @@ _deps
 
 build/*
 cmake-build-*/*
+.idea/misc.xml
+.idea/modules.xml
+.idea/raytracer.iml
+.idea/vcs.xml
+.idea/codeStyles/codeStyleConfig.xml
