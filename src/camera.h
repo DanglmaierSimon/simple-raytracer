@@ -6,17 +6,15 @@
 
 class camera {
   public:
-    camera(vec3   lookfrom,
-           vec3   lookat,
-           vec3   vup,
-           double vfov, // vertical field of view
-           double aspect,
-           double aperture,
-           double focus_dist // for blur/depth of field simulation
-
+    camera(vec3 const& lookfrom,
+           vec3 const& lookat,
+           vec3 const& vup,
+           double      vfov, // vertical field of view
+           double      aspect,
+           double      aperture,
+           double      focus_dist // for blur/depth of field simulation
     )
     {
-
         _origin      = lookfrom;
         _lens_radius = aperture / 2;
 
