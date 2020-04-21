@@ -6,25 +6,24 @@
 
 class camera {
   public:
-    camera(vec3 const& lookfrom,
-           vec3 const& lookat,
-           vec3 const& vup,
-           double      vfov, // vertical field of view
-           double      aspect,
-           double      aperture,
-           double      focus_dist // for blur/depth of field simulation
-    )
+    constexpr camera(vec3 const& lookfrom,
+                     vec3 const& lookat,
+                     vec3 const& vup,
+                     double      vfov, // vertical field of view
+                     double      aspect,
+                     double      aperture,
+                     double      focus_dist // for blur/depth of field simulation
+                     )
+        : _lens_radius{aperture / 2}
+        , _origin{lookfrom}
+        , _w{unit_vector(lookfrom - lookat)}
+        , _u{unit_vector(cross(vup, _w))}
+        , _v{cross(_w, _u)}
     {
-        _origin      = lookfrom;
-        _lens_radius = aperture / 2;
 
         auto theta       = degrees_to_radians(vfov);
         auto half_height = tan(theta / 2);
         auto half_width  = aspect * half_height;
-
-        _w = unit_vector(lookfrom - lookat);
-        _u = unit_vector(cross(vup, _w));
-        _v = cross(_w, _u);
 
         _lower_left_corner = _origin - half_width * focus_dist * _u - half_height * focus_dist * _v
                              - focus_dist * _w;
