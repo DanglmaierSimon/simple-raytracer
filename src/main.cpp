@@ -1,16 +1,16 @@
 #include <fstream>
 #include <iostream>
 
-#include "geometry/ray.h"
-#include "geometry/vec3.h"
-#include "camera/camera.h"
-#include "materials/dielectric.h"
-#include "materials/lambertian.h"
-#include "materials/metal.h"
-#include "shapes/hittable.h"
-#include "shapes/hittable_list.h"
-#include "shapes/sphere.h"
-#include "util/util.h"
+#include "camera.h"
+#include "dielectric.h"
+#include "hittable.h"
+#include "hittable_list.h"
+#include "lambertian.h"
+#include "metal.h"
+#include "ray.h"
+#include "sphere.h"
+#include "util.h"
+#include "vec3.h"
 
 inline vec3 ray_color(ray const& r, hittable const& world, int depth)
 {

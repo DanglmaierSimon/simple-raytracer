@@ -26,14 +26,17 @@ add_compile_options(
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_executable(raytracer main.cpp)
-
-add_subdirectory(geometry)
-add_subdirectory(camera)
-add_subdirectory(materials)
-add_subdirectory(shapes)
-add_subdirectory(util)
-
-target_link_libraries(raytracer PUBLIC util shapes materials geometry camera)
-
-target_include_directories(raytracer PUBLIC .)
+add_executable(
+  ${PROJECT_NAME}
+  main.cpp
+  vec3.h
+  util.h
+  sphere.h
+  ray.h
+  metal.h
+  material.h
+  lambertian.h
+  hittable.h
+  hittable_list.h
+  dielectric.h
+  camera.h)
