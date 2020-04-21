@@ -21,6 +21,7 @@ class hittable_list : public hittable {
     {
         _objects.clear();
     }
+
     void add(shared_ptr<hittable> const& obj)
     {
         _objects.push_back(obj);
