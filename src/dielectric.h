@@ -7,11 +7,11 @@
 
 class dielectric : public material {
   public:
-    explicit dielectric(double ri)
-        : ref_idx{ri} {};
+    explicit constexpr dielectric(double ri)
+        : _ref_idx{ri} {};
 
-    bool scatter(const ray&        r_in,
-                 const hit_record& rec,
+    bool scatter(ray const&        r_in,
+                 hit_record const& rec,
                  vec3&             attenuation,
                  ray&              scattered) const override
     {
@@ -19,10 +19,10 @@ class dielectric : public material {
         double etai_over_etat;
 
         if (rec.front_face) {
-            etai_over_etat = 1.0 / ref_idx;
+            etai_over_etat = 1.0 / _ref_idx;
         }
         else {
-            etai_over_etat = ref_idx;
+            etai_over_etat = _ref_idx;
         }
 
         vec3 unit_direction = unit_vector(r_in.direction());
@@ -50,5 +50,5 @@ class dielectric : public material {
     }
 
   private:
-    double ref_idx;
+    double _ref_idx;
 };
