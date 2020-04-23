@@ -9,9 +9,9 @@ struct hit_record
 {
     vec3                 p;
     vec3                 normal;
-    shared_ptr<material> mat_ptr;
-    double               t;
-    bool                 front_face;
+    shared_ptr<material> mat_ptr{nullptr};
+    double               t{0.0};
+    bool                 front_face{false};
 
     constexpr void set_face_normal(ray const& r, vec3 const& outward_normal)
     {
