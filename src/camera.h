@@ -15,12 +15,11 @@ class camera {
                      double      focus_dist // for blur/depth of field simulation
                      )
         : _origin{lookfrom}
-        , _u{unit_vector(cross(vup, _w))}
-        , _v{cross(_w, _u)}
-        , _w{unit_vector(lookfrom - lookat)}
         , _lens_radius{aperture / 2}
-
     {
+        _w = unit_vector(lookfrom - lookat);
+        _u = unit_vector(cross(vup, _w));
+        _v = cross(_w, _u);
 
         auto theta       = degrees_to_radians(vfov);
         auto half_height = tan(theta / 2);
