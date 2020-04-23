@@ -53,17 +53,26 @@ hittable_list random_scene()
                 if (choose_mat < 0.8) {
                     // diffuse
                     auto albedo = vec3::random() * vec3::random();
-                    world.add(make_shared<sphere>(center, 0.2, make_shared<lambertian>(albedo)));
+                    auto lam    = make_shared<lambertian>(albedo);
+                    auto s      = make_shared<sphere>(center, 0.2, lam);
+
+                    world.add(s);
                 }
                 else if (choose_mat < 0.95) {
                     // metal
                     auto albedo = vec3::random(.5, 1);
-                    auto fuzz   = random_double(0, .5);
-                    world.add(make_shared<sphere>(center, 0.2, make_shared<metal>(albedo, fuzz)));
+                    auto fuzz   = random_double(0, 0.5);
+                    auto m      = make_shared<metal>(albedo, fuzz);
+                    auto s      = make_shared<sphere>(center, 0.2, m);
+
+                    world.add(s);
                 }
                 else {
                     // glass
-                    world.add(make_shared<sphere>(center, 0.2, make_shared<dielectric>(1.5)));
+                    auto d = make_shared<dielectric>(1.5);
+                    auto s = make_shared<sphere>(center, 0.2, d);
+
+                    world.add(s);
                 }
             }
         }
