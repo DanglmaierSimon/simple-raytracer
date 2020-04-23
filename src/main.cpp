@@ -102,6 +102,10 @@ int main()
 
     const int max_recursion_depth = 50;
 
+    const int total_scan_lines = img_height - 1;
+
+    int scan_lines_remaining = total_scan_lines;
+
     auto world = random_scene();
 
     vec3 lookfrom(13, 2, 3);
@@ -115,7 +119,7 @@ int main()
     out << "P3\n" << img_width << " " << img_height << "\n255\n";
 
     for (int j = img_height - 1; j >= 0; --j) {
-        std::cerr << "\rScanlines remaining: " << j << " " << std::flush;
+        std::cerr << "\rScanlines remaining: " << scan_lines_remaining << " " << std::flush;
 
         for (int i = 0; i < img_width; i++) {
             vec3 color(0, 0, 0);
@@ -130,6 +134,8 @@ int main()
             }
             color.write_color(out, samples_per_pixel);
         }
+
+        scan_lines_remaining--;
     }
 
     std::cerr << "\nDone!\n";
