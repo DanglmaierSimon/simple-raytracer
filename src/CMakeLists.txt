@@ -37,6 +37,9 @@ add_executable(
   hittable.h
   hittable_list.h
   dielectric.h
+  camera.h
+  elapsed_timer.h)
+
 set(CMAKE_CXX_STANDARD 17 REQUIRED)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
