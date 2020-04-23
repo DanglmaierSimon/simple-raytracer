@@ -98,7 +98,7 @@ int main()
 
     const int samples_per_pixel = 100;
 
-    const auto aspect_ratio = double(img_width) / img_height;
+    const double aspect_ratio = double(img_width) / img_height;
 
     const int max_recursion_depth = 50;
 
