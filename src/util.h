@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <functional>
@@ -66,4 +67,25 @@ std::string left_pad_string(std::string str, unsigned int length, char pad_char)
     }
 
     return str.insert(0, length - str.size(), pad_char);
+}
+
+std::string format_time(std::chrono::nanoseconds time)
+{
+    using namespace std::chrono;
+
+    auto ms_str =
+        left_pad_string(std::to_string(duration_cast<milliseconds>(time).count() % 1000), 3, '0');
+
+    auto mcs_str =
+        left_pad_string(std::to_string(duration_cast<microseconds>(time).count() % 1000), 3, '0');
+
+    auto ns_str =
+        left_pad_string(std::to_string(duration_cast<nanoseconds>(time).count() % 1000), 3, '0');
+
+    return ms_str + "ms " + mcs_str + "µs " + ns_str + "ns";
+}
+
+std::string format_time(long long time)
+{
+    return format_time(static_cast<std::chrono::nanoseconds>(time));
 }
