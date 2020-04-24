@@ -18,9 +18,8 @@ class elapsed_timer {
 
     int msecs_elapsed()
     {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(
-                   std::chrono::steady_clock::now() - _start)
-            .count();
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(steady_clock::now() - _start).count();
     }
 
   private:
