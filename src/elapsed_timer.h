@@ -22,6 +22,11 @@ class elapsed_timer {
         return duration_cast<milliseconds>(steady_clock::now() - _start).count();
     }
 
+    int nsecs_elapsed()
+    {
+        using namespace std::chrono;
+        return duration_cast<nanoseconds>(steady_clock::now() - _start).count();
+    }
   private:
     std::chrono::steady_clock::time_point _start;
 };
