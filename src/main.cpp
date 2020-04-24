@@ -3,10 +3,12 @@
 
 #include "camera.h"
 #include "dielectric.h"
+#include "elapsed_timer.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "lambertian.h"
 #include "metal.h"
+#include "profiler.h"
 #include "ray.h"
 #include "sphere.h"
 #include "util.h"
@@ -39,6 +41,9 @@ inline vec3 ray_color(ray const& r, hittable const& world, int depth)
 
 hittable_list random_scene()
 {
+    elapsed_timer timer;
+    timer.start();
+
     hittable_list world;
 
     world.add(
@@ -85,6 +90,8 @@ hittable_list random_scene()
     world.add(
         make_shared<sphere>(vec3(4, 1, 0), 1.0, make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0)));
 
+    std::cout << "Creating the world took " << format_time(timer.elapsed()) << "." << std::endl;
+
     return world;
 }
 
@@ -105,6 +112,8 @@ int main()
 
     int scan_lines_remaining = total_scan_lines;
 
+    profiler scan_line_profiler(total_scan_lines);
+
     auto world = random_scene();
 
     vec3 lookfrom(13, 2, 3);
@@ -119,6 +128,9 @@ int main()
 
     for (int j = img_height - 1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << scan_lines_remaining << " " << std::flush;
+
+        elapsed_timer timer;
+        timer.start();
 
         for (int i = 0; i < img_width; i++) {
             vec3 color(0, 0, 0);
@@ -135,7 +147,11 @@ int main()
         }
 
         scan_lines_remaining--;
+
+        scan_line_profiler.add(timer.nsecs_elapsed());
     }
+
+    scan_line_profiler.print_profiler_stats();
 
     std::cerr << "\nDone!\n";
     return 0;
