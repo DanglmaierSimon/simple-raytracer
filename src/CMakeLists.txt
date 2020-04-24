@@ -39,6 +39,7 @@ target_compile_options(
           -Wno-unused
           -Wno-variadic-macros
           -Wno-parentheses
+          -Wunused
           -fdiagnostics-show-option)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD 17)
