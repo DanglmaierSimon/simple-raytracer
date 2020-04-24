@@ -12,7 +12,8 @@ add_executable(
   hittable_list.h
   dielectric.h
   camera.h
-  elapsed_timer.h)
+  elapsed_timer.h
+  profiler.h)
 
 target_compile_options(
   ${PROJECT_NAME}
