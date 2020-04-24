@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <random>
+#include <string>
 
 // Usings
 using std::make_shared;
@@ -56,4 +57,13 @@ constexpr double clamp(double x, double min, double max)
     }
 
     return x;
+}
+
+std::string left_pad_string(std::string str, unsigned int length, char pad_char)
+{
+    if (length < str.size()) {
+        return str;
+    }
+
+    return str.insert(0, length - str.size(), pad_char);
 }
