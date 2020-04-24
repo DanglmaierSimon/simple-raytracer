@@ -16,8 +16,7 @@ add_executable(
 
 target_compile_options(
   ${PROJECT_NAME}
-  PRIVATE -Werror
-          -Wall
+  PRIVATE -Wall
           -Wextra
           -pedantic
           -Wcast-align
