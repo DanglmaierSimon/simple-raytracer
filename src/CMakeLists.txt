@@ -1,29 +1,3 @@
-add_compile_options(
-  -Werror
-  -Wall
-  -Wextra
-  -pedantic
-  -Wcast-align
-  -Wcast-qual
-  -Wctor-dtor-privacy
-  -Wdisabled-optimization
-  -Wformat=2
-  -Winit-self
-  -Wlogical-op
-  -Wmissing-include-dirs
-  -Wnoexcept
-  -Wold-style-cast
-  -Woverloaded-virtual
-  -Wredundant-decls
-  -Wshadow
-  -Wsign-promo
-  -Wstrict-null-sentinel
-  -Wundef
-  -Wno-unused
-  -Wno-variadic-macros
-  -Wno-parentheses
-  -fdiagnostics-show-option)
-
 add_executable(
   ${PROJECT_NAME}
   main.cpp
@@ -40,7 +14,35 @@ add_executable(
   camera.h
   elapsed_timer.h)
 
-set(CMAKE_CXX_STANDARD 17 REQUIRED)
+target_compile_options(
+  ${PROJECT_NAME}
+  PRIVATE -Werror
+          -Wall
+          -Wextra
+          -pedantic
+          -Wcast-align
+          -Wcast-qual
+          -Wctor-dtor-privacy
+          -Wdisabled-optimization
+          -Wformat=2
+          -Winit-self
+          -Wlogical-op
+          -Wmissing-include-dirs
+          -Wnoexcept
+          -Wold-style-cast
+          -Woverloaded-virtual
+          -Wredundant-decls
+          -Wshadow
+          -Wsign-promo
+          -Wstrict-null-sentinel
+          -Wundef
+          -Wno-unused
+          -Wno-variadic-macros
+          -Wno-parentheses
+          -fdiagnostics-show-option)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD 17)
+set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                                  "${CMAKE_BINARY_DIR}")
