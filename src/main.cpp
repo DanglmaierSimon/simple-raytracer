@@ -151,8 +151,10 @@ int main()
         scan_line_profiler.add(timer.nsecs_elapsed());
     }
 
+    std::cout << std::endl;
+
     scan_line_profiler.print_profiler_stats();
 
-    std::cerr << "\nDone!\n";
+    std::cerr << "Done!\n";
     return 0;
 }
