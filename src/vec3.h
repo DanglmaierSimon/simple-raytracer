@@ -64,7 +64,7 @@ class vec3 {
         return *this *= 1 / t;
     }
 
-    constexpr double length() const
+    double length() const
     {
         return sqrt(length_squared());
     }
@@ -148,7 +148,7 @@ constexpr vec3 cross(vec3 const& u, vec3 const& v)
     return vec3{u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]};
 }
 
-constexpr vec3 unit_vector(vec3 const& v)
+vec3 unit_vector(vec3 const& v)
 {
     return v / v.length();
 }
@@ -180,7 +180,7 @@ constexpr vec3 reflect(vec3 const& v, vec3 const& n)
     return v - 2 * dot(v, n) * n;
 }
 
-constexpr vec3 refract(vec3 const& uv, vec3 const& n, double etai_over_etat)
+vec3 refract(vec3 const& uv, vec3 const& n, double etai_over_etat)
 {
     auto cos_theta      = dot(-uv, n);
     vec3 r_out_parallel = etai_over_etat * (uv + cos_theta * n);
