@@ -29,32 +29,9 @@ print_success() {
     echo -e "${GREEN}$1${NC}"
 }
 
-BUILD_TYPE="DEBUG"
-
 print_info "Starting build script..."
 
-while [[ $# -gt 0 ]]; do
-    key="$1"
-
-    case $key in
-    --release)
-        BUILD_TYPE="RELEASE"
-        ;;
-    --debug)
-        BUILD_TYPE="DEBUG"
-        ;;
-    --profile)
-        BUILD_TYPE="RELWITHDEBINFO"
-        ;;
-    esac
-    shift
-done
-
-print_info "Build Type: $BUILD_TYPE"
-
-BUILD_TYPE_DIR=$(echo "$BUILD_TYPE" | tr '[:upper:]' '[:lower:]') 
-
-OUTPUT_DIR="build_$BUILD_TYPE_DIR"
+OUTPUT_DIR="build"
 DEFAULT_TARGET="raytracer"
 
 mkdir -p "$__dir"/"$OUTPUT_DIR"
@@ -63,7 +40,7 @@ cd "$__dir"/"$OUTPUT_DIR" || exit 255
 
 print_info "Running cmake..."
 
-cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+cmake .. -DCMAKE_BUILD_TYPE=RELWITHDEBINFO
 
 print_info "Building target $DEFAULT_TARGET..."
 

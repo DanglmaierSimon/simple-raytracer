@@ -29,11 +29,11 @@ print_success() {
     echo -e "${GREEN}$1${NC}"
 }
 
-print_info "Building project in release mode..."
+print_info "Building project in profile mode..."
 
-"$__dir/build.sh" --release
+"$__dir/build.sh"
 
-cd "$__dir/build_release" || exit 255
+cd "$__dir/build" || exit 255
 
 print_info "Removing old image..."
 
@@ -41,7 +41,7 @@ rm -f image.ppm
 
 print_info "Generating image..."
 
-"$__dir/build_release/raytracer"
+"$__dir/build/raytracer"
 
 print_success "Image created successfully!"
 
