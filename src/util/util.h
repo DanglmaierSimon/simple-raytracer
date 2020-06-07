@@ -60,7 +60,7 @@ constexpr double clamp(double x, double min, double max)
     return x;
 }
 
-std::string left_pad_string(std::string str, unsigned int length, char pad_char)
+inline std::string left_pad_string(std::string str, unsigned int length, char pad_char)
 {
     if (length < str.size()) {
         return str;
@@ -69,7 +69,7 @@ std::string left_pad_string(std::string str, unsigned int length, char pad_char)
     return str.insert(0, length - str.size(), pad_char);
 }
 
-std::string format_time(std::chrono::nanoseconds time)
+inline std::string format_time(std::chrono::nanoseconds time)
 {
     using namespace std::chrono;
 
@@ -85,7 +85,7 @@ std::string format_time(std::chrono::nanoseconds time)
     return ms_str + "ms " + mcs_str + "µs " + ns_str + "ns";
 }
 
-std::string format_time(long long time)
+inline std::string format_time(long long time)
 {
     return format_time(static_cast<std::chrono::nanoseconds>(time));
 }
