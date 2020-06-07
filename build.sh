@@ -55,6 +55,8 @@ print_info "Build Type: $BUILD_TYPE"
 OUTPUT_DIR="build"
 DEFAULT_TARGET="raytracer"
 
+mkdir -p "$__dir"/"$OUTPUT_DIR"
+
 cd "$__dir"/"$OUTPUT_DIR" || exit -1
 
 print_info "Running cmake..."
