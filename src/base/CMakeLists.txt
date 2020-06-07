@@ -2,7 +2,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(LIB_NAME base)
 
-add_library(${LIB_NAME} STATIC camera.h hittable_list.h hittable.h ray.h sphere.h vec3.h)
+add_library(${LIB_NAME} STATIC camera.h hittable_list.h hittable.h ray.h sphere.h vec3.h vec3.cpp)
 
 set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
