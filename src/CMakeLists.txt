@@ -1,19 +1,13 @@
+add_subdirectory(base)
+add_subdirectory(util)
+add_subdirectory(materials)
+
 add_executable(
   ${PROJECT_NAME}
   main.cpp
-  vec3.h
-  util.h
-  sphere.h
-  ray.h
-  metal.h
-  material.h
-  lambertian.h
-  hittable.h
-  hittable_list.h
-  dielectric.h
-  camera.h
-  elapsed_timer.h
-  profiler.h)
+)
+
+target_link_libraries(${PROJECT_NAME} util materials base)
 
 target_compile_options(
   ${PROJECT_NAME}
