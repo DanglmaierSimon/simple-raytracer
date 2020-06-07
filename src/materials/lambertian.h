@@ -10,7 +10,7 @@ class lambertian : public material {
     {
     }
 
-    bool scatter(ray const&        r_in,
+    bool scatter(ray const&,
                  hit_record const& rec,
                  vec3&             attenuation,
                  ray&              scattered) const override

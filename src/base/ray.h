@@ -2,6 +2,8 @@
 
 #include "vec3.h"
 
+class hittable;
+
 class ray {
   public:
     constexpr ray() = default;
@@ -28,3 +30,5 @@ class ray {
     vec3 _origin;
     vec3 _dir;
 };
+
+vec3 ray_color(const ray& r, const hittable& world, int depth);

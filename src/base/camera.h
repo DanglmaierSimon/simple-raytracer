@@ -32,14 +32,7 @@ class camera {
         _vertical   = 2 * half_height * focus_dist * _v;
     }
 
-    ray get_ray(double s, double t)
-    {
-        vec3 rd     = _lens_radius * random_in_unit_disk();
-        vec3 offset = _u * rd.x() + _v * rd.y();
-
-        return ray(_origin + offset,
-                   _lower_left_corner + s * _horicontal + t * _vertical - _origin - offset);
-    }
+    ray get_ray(double s, double t);
 
   private:
     vec3   _origin;

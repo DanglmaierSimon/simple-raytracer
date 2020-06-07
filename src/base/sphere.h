@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <utility>
 
 #include "hittable.h"
@@ -8,7 +9,7 @@
 class sphere : public hittable {
 
   public:
-    sphere(vec3 center, double radius, shared_ptr<material> m)
+    sphere(vec3 center, double radius, std::shared_ptr<material> m)
         : _center{center}
         , _radius{radius}
         , _mat_ptr{std::move(m)}
@@ -28,9 +29,9 @@ class sphere : public hittable {
     }
 
   private:
-    vec3                 _center;
-    double               _radius{0.0};
-    shared_ptr<material> _mat_ptr;
+    vec3                      _center;
+    double                    _radius{0.0};
+    std::shared_ptr<material> _mat_ptr;
 };
 
 bool sphere::hit(ray const& r, double t_min, double t_max, hit_record& rec) const

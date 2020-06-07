@@ -15,7 +15,7 @@ class material {
                          ray&              scattered) const = 0;
 };
 
-double schlick(double cosine, double ref_idx)
+inline double schlick(double cosine, double ref_idx)
 {
     auto r0 = (1 - ref_idx) / (1 + ref_idx);
     r0      = r0 * r0;

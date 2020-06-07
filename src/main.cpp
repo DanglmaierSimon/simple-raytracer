@@ -14,31 +14,6 @@
 #include "util/profiler.h"
 #include "util/util.h"
 
-inline vec3 ray_color(ray const& r, hittable const& world, int depth)
-{
-    hit_record rec;
-
-    if (depth <= 0) {
-        return vec3(0, 0, 0);
-    }
-
-    if (world.hit(r, 0.001, infinity, rec)) {
-        ray  scattered;
-        vec3 attenuation;
-        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-            return attenuation * ray_color(scattered, world, depth - 1);
-        }
-
-        return vec3(0, 0, 0);
-    }
-
-    vec3 unit_dir = unit_vector(r.direction());
-
-    auto t = 0.5 * (unit_dir.y() + 1.0);
-
-    return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
-}
-
 hittable_list random_scene()
 {
     elapsed_timer timer;
@@ -97,6 +72,9 @@ hittable_list random_scene()
 
 int main()
 {
+    elapsed_timer timer_total;
+    timer_total.start();
+
     std::ofstream out("image.ppm", std::ios::trunc | std::ios::out);
 
     const int img_width  = 200;
@@ -151,10 +129,14 @@ int main()
         scan_line_profiler.add(timer.nsecs_elapsed());
     }
 
+    auto time = timer_total.elapsed();
+
     std::cout << std::endl;
 
     scan_line_profiler.print_profiler_stats();
 
-    std::cerr << "Done!\n";
+    std::cout << "Total time: " << format_time(time) << std::endl;
+
+    std::cout << "Done!\n";
     return 0;
 }

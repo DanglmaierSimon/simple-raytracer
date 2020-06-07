@@ -3,6 +3,7 @@
 #include "material.h"
 
 #include "ray.h"
+#include "util.h"
 #include "vec3.h"
 
 class dielectric : public material {
