@@ -52,12 +52,14 @@ done
 
 print_info "Build Type: $BUILD_TYPE"
 
-OUTPUT_DIR="build"
+BUILD_TYPE_DIR=$(echo "$BUILD_TYPE" | tr '[:upper:]' '[:lower:]') 
+
+OUTPUT_DIR="build_$BUILD_TYPE_DIR"
 DEFAULT_TARGET="raytracer"
 
 mkdir -p "$__dir"/"$OUTPUT_DIR"
 
-cd "$__dir"/"$OUTPUT_DIR" || exit -1
+cd "$__dir"/"$OUTPUT_DIR" || exit 255
 
 print_info "Running cmake..."
 

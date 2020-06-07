@@ -33,7 +33,7 @@ print_info "Building project in release mode..."
 
 "$__dir/build.sh" --release
 
-cd "$__dir/build" || exit -1
+cd "$__dir/build_release" || exit 255
 
 print_info "Removing old image..."
 
@@ -41,7 +41,7 @@ rm -f image.ppm
 
 print_info "Generating image..."
 
-"$__dir/build/raytracer"
+"$__dir/build_release/raytracer"
 
 print_success "Image created successfully!"
 
