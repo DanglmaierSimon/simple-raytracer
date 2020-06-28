@@ -1,11 +1,11 @@
 #include <fstream>
 #include <iostream>
 
-#include "base/camera.h"
+#include "objects/camera.h"
 #include "base/hittable.h"
 #include "base/hittable_list.h"
 #include "base/ray.h"
-#include "base/sphere.h"
+#include "objects/sphere.h"
 #include "base/vec3.h"
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"

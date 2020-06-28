@@ -1,13 +1,14 @@
 add_subdirectory(base)
 add_subdirectory(util)
 add_subdirectory(materials)
+add_subdirectory(objects)
 
 add_executable(
   ${PROJECT_NAME}
   main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} util materials base)
+target_link_libraries(${PROJECT_NAME} util materials base objects)
 
 target_compile_options(
   ${PROJECT_NAME}
