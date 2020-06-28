@@ -44,6 +44,6 @@ cmake .. -DCMAKE_BUILD_TYPE=RELWITHDEBINFO
 
 print_info "Building target $DEFAULT_TARGET..."
 
-make $DEFAULT_TARGET -j 4
+make $DEFAULT_TARGET -j "$(nproc)"
 
 print_success "==== BUILD SCRIPT SUCCESSFUL ===="
