@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
@@ -26,24 +27,16 @@ constexpr double degrees_to_radians(double degrees)
 
 constexpr double ffmin(double a, double b)
 {
-    return a <= b ? a : b;
+    return std::min(a, b);
 }
 constexpr double ffmax(double a, double b)
 {
-    return a >= b ? a : b;
+    return std::max(a, b);
 }
 
 constexpr double clamp(double x, double min, double max)
 {
-    if (x < min) {
-        return min;
-    }
-
-    if (x > max) {
-        return max;
-    }
-
-    return x;
+    return std::clamp(x, min, max);
 }
 
 double random_double();
