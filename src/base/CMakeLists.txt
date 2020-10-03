@@ -1,6 +1,6 @@
 set(LIB_NAME base)
 
-set(HEADERS hit_record.h hittable.h hittable_list.h ray.h vec3.h)
+set(HEADERS hit_record.h hittable.h hittable_list.h ray.h vec3.h ppm_image.h)
 
 set(SOURCES hittable_list.cpp vec3.cpp ray.cpp)
 
