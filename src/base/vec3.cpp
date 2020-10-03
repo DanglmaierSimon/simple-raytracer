@@ -13,9 +13,9 @@ void vec3::write_color(std::ostream& os, int samples_per_pixel)
     // for a gamma value of 2.0.
     auto scale = 1.0 / samples_per_pixel;
 
-    auto r = sqrt(scale * _e[0]);
-    auto g = sqrt(scale * _e[1]);
-    auto b = sqrt(scale * _e[2]);
+    auto r = sqrt(scale * x());
+    auto g = sqrt(scale * y());
+    auto b = sqrt(scale * z());
 
     os << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << " "
        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << " "
