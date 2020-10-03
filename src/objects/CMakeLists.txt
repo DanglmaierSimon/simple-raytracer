@@ -4,7 +4,7 @@ set(HEADERS camera.h sphere.h)
 
 set(SOURCES camera.cpp)
 
-add_library(${LIB_NAME} STATIC ${HEADERS} ${SOURCES})
+add_library(${LIB_NAME} SHARED ${HEADERS} ${SOURCES})
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 
