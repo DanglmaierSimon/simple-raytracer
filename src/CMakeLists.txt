@@ -2,6 +2,7 @@ add_subdirectory(base)
 add_subdirectory(util)
 add_subdirectory(materials)
 add_subdirectory(objects)
+add_subdirectory(external/benchmark)
 
 add_executable(
   ${PROJECT_NAME}
