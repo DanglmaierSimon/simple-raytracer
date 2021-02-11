@@ -4,28 +4,31 @@
 #include <cmath>
 #include <iostream>
 
-class vec3 : std::array<double, 3> {
+#include "util.h"
+
+class vec3 {
   public:
     constexpr vec3()
         : vec3(0.0, 0.0, 0.0)
     {
     }
+
     constexpr vec3(double e0, double e1, double e2)
-        : std::array<double, 3>{e0, e1, e2}
+        : d{e0, e1, e2}
     {
     }
 
     constexpr double x() const
     {
-        return at(0);
+        return d[0];
     }
     constexpr double y() const
     {
-        return at(1);
+        return d[1];
     }
     constexpr double z() const
     {
-        return at(2);
+        return d[2];
     }
 
     constexpr vec3 operator-() const
@@ -35,26 +38,27 @@ class vec3 : std::array<double, 3> {
 
     constexpr double operator[](int i) const
     {
-        return at(i);
+        return d[i];
     }
     constexpr double& operator[](int i)
     {
-        return at(i);
+        return d[i];
     }
 
     constexpr vec3& operator+=(vec3 const& v)
     {
-        data()[0] += v.at(0);
-        data()[1] += v.at(1);
-        data()[2] += v.at(2);
+        d[0] += v.x();
+        d[1] += v.y();
+        d[2] += v.z();
+
         return *this;
     }
 
     constexpr vec3& operator*=(double t)
     {
-        data()[0] *= t;
-        data()[1] *= t;
-        data()[2] *= t;
+        d[0] *= t;
+        d[1] *= t;
+        d[2] *= t;
         return *this;
     }
 
@@ -63,7 +67,11 @@ class vec3 : std::array<double, 3> {
         return *this *= 1 / t;
     }
 
-    double           length() const;
+    constexpr double length() const
+    {
+        return util::sqrt(length_squared());
+    }
+
     constexpr double length_squared() const
     {
         return x() * x() + y() * y() + z() * z();
@@ -73,6 +81,9 @@ class vec3 : std::array<double, 3> {
 
     static vec3 random();
     static vec3 random(double min, double max);
+
+  private:
+    double d[3];
 };
 
 inline std::ostream& operator<<(std::ostream& os, vec3 const& v)
@@ -124,13 +135,24 @@ constexpr vec3 cross(vec3 const& u, vec3 const& v)
     return vec3{u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]};
 }
 
-vec3 unit_vector(vec3 const& v);
+constexpr vec3 unit_vector(vec3 const& v)
+{
+    return v / v.length();
+}
 
 vec3 random_in_unit_sphere();
 vec3 random_unit_vector();
 vec3 random_in_unit_disk();
 
-vec3           refract(vec3 const& uv, vec3 const& n, double etai_over_etat);
+constexpr vec3 refract(vec3 const& uv, vec3 const& n, double etai_over_etat)
+{
+    auto cos_theta      = dot(-uv, n);
+    vec3 r_out_parallel = etai_over_etat * (uv + cos_theta * n);
+    vec3 r_out_perp     = -util::sqrt(1.0 - r_out_parallel.length_squared()) * n;
+
+    return r_out_parallel + r_out_perp;
+}
+
 constexpr vec3 reflect(vec3 const& v, vec3 const& n)
 {
     return v - 2 * dot(v, n) * n;
