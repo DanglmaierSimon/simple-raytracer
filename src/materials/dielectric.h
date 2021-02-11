@@ -28,7 +28,7 @@ class dielectric : public material {
 
         vec3 unit_direction = unit_vector(r_in.direction());
 
-        double cos_theta = ffmin(dot(-unit_direction, rec.normal), 1.0);
+        double cos_theta = std::min(dot(-unit_direction, rec.normal), 1.0);
         double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
         if (etai_over_etat * sin_theta > 1.0) {
@@ -39,7 +39,7 @@ class dielectric : public material {
 
         double reflect_prob = schlick(cos_theta, etai_over_etat);
 
-        if (random_double() < reflect_prob) {
+        if (util::random_double() < reflect_prob) {
             vec3 reflected = reflect(unit_direction, rec.normal);
             scattered      = ray(rec.p, reflected);
             return true;

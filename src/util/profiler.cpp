@@ -50,6 +50,6 @@ long long profiler::min() const
 void profiler::print_profiler_stats()
 {
     std::cout << "======= Stats =======" << std::endl;
-    std::cout << "Minimum time: " << format_time(min()) << std::endl;
-    std::cout << "Maximum time: " << format_time(max()) << std::endl;
+    std::cout << "Minimum time: " << util::format_time(min()) << std::endl;
+    std::cout << "Maximum time: " << util::format_time(max()) << std::endl;
 }

@@ -21,9 +21,9 @@ class camera {
         _u = unit_vector(cross(vup, _w));
         _v = cross(_w, _u);
 
-        auto theta       = degrees_to_radians(vfov);
-        auto half_height = tan(theta / 2);
-        auto half_width  = aspect * half_height;
+        const auto theta       = util::degrees_to_radians(vfov);
+        const auto half_height = tan(theta / 2);
+        const auto half_width  = aspect * half_height;
 
         _lower_left_corner = _origin - half_width * focus_dist * _u - half_height * focus_dist * _v
                              - focus_dist * _w;

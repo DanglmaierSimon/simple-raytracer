@@ -1,21 +1,23 @@
 #include <fstream>
 #include <iostream>
 
-#include "objects/camera.h"
 #include "base/hittable.h"
 #include "base/hittable_list.h"
 #include "base/ray.h"
-#include "objects/sphere.h"
 #include "base/vec3.h"
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"
 #include "materials/metal.h"
+#include "objects/camera.h"
+#include "objects/sphere.h"
 #include "util/elapsed_timer.h"
 #include "util/profiler.h"
 #include "util/util.h"
 
 hittable_list random_scene()
 {
+    using namespace std;
+
     elapsed_timer timer;
     timer.start();
 
@@ -26,30 +28,32 @@ hittable_list random_scene()
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
-            auto choose_mat = random_double();
-            vec3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+            const auto choose_mat = util::random_double();
+            const vec3 center(a + 0.9 * util::random_double(),
+                              0.2,
+                              b + 0.9 * util::random_double());
             if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
                 if (choose_mat < 0.8) {
                     // diffuse
-                    auto albedo = vec3::random() * vec3::random();
-                    auto lam    = make_shared<lambertian>(albedo);
-                    auto s      = make_shared<sphere>(center, 0.2, lam);
+                    const auto albedo = vec3::random() * vec3::random();
+                    const auto lam    = make_shared<lambertian>(albedo);
+                    const auto s      = make_shared<sphere>(center, 0.2, lam);
 
                     world.add(s);
                 }
                 else if (choose_mat < 0.95) {
                     // metal
-                    auto albedo = vec3::random(.5, 1);
-                    auto fuzz   = random_double(0, 0.5);
-                    auto m      = make_shared<metal>(albedo, fuzz);
-                    auto s      = make_shared<sphere>(center, 0.2, m);
+                    const auto albedo = vec3::random(.5, 1);
+                    const auto fuzz   = util::random_double(0, 0.5);
+                    const auto m      = make_shared<metal>(albedo, fuzz);
+                    const auto s      = make_shared<sphere>(center, 0.2, m);
 
                     world.add(s);
                 }
                 else {
                     // glass
-                    auto d = make_shared<dielectric>(1.5);
-                    auto s = make_shared<sphere>(center, 0.2, d);
+                    const auto d = make_shared<dielectric>(1.5);
+                    const auto s = make_shared<sphere>(center, 0.2, d);
 
                     world.add(s);
                 }
@@ -65,7 +69,8 @@ hittable_list random_scene()
     world.add(
         make_shared<sphere>(vec3(4, 1, 0), 1.0, make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0)));
 
-    std::cout << "Creating the world took " << format_time(timer.elapsed()) << "." << std::endl;
+    std::cout << "Creating the world took " << util::format_time(timer.elapsed()) << "."
+              << std::endl;
 
     return world;
 }
@@ -92,15 +97,15 @@ int main()
 
     profiler scan_line_profiler(total_scan_lines);
 
-    auto world = random_scene();
+    const auto world = random_scene();
 
-    vec3 lookfrom(13, 2, 3);
-    vec3 lookat(0, 0, 0);
-    vec3 vup(0, 1, 0);
-    auto dist_to_focus = 10.0;
-    auto aperture      = 0.1;
+    const vec3   lookfrom(13, 2, 3);
+    const vec3   lookat(0, 0, 0);
+    const vec3   vup(0, 1, 0);
+    const double dist_to_focus = 10.0;
+    const double aperture      = 0.1;
 
-    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+    const camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
     out << "P3\n" << img_width << " " << img_height << "\n255\n";
 
@@ -114,10 +119,10 @@ int main()
             vec3 color(0, 0, 0);
 
             for (int s = 0; s < samples_per_pixel; s++) {
-                auto u = (i + random_double()) / img_width;
-                auto v = (j + random_double()) / img_height;
+                const auto u = (i + util::random_double()) / img_width;
+                const auto v = (j + util::random_double()) / img_height;
 
-                ray r = cam.get_ray(u, v);
+                const ray r = cam.get_ray(u, v);
 
                 color += ray_color(r, world, max_recursion_depth);
             }
@@ -135,7 +140,7 @@ int main()
 
     scan_line_profiler.print_profiler_stats();
 
-    std::cout << "Total time: " << format_time(time) << std::endl;
+    std::cout << "Total time: " << util::format_time(time) << std::endl;
 
     std::cout << "Done!\n";
     return 0;
