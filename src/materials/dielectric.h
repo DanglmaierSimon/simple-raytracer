@@ -37,7 +37,7 @@ class dielectric : public material {
             return true;
         }
 
-        double reflect_prob = schlick(cos_theta, etai_over_etat);
+        const double reflect_prob = schlick(cos_theta, etai_over_etat);
 
         if (util::random_double() < reflect_prob) {
             vec3 reflected = reflect(unit_direction, rec.normal);

@@ -32,7 +32,7 @@ class camera {
         _vertical   = 2 * half_height * focus_dist * _v;
     }
 
-    ray get_ray(double s, double t);
+    ray get_ray(double s, double t) const;
 
   private:
     vec3   _origin;

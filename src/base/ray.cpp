@@ -23,9 +23,9 @@ vec3 ray_color(const ray& r, const hittable& world, int depth)
         return vec3(0, 0, 0);
     }
 
-    vec3 unit_dir = unit_vector(r.direction());
+    const vec3 unit_dir = unit_vector(r.direction());
 
-    auto t = 0.5 * (unit_dir.y() + 1.0);
+    const double t = 0.5 * (unit_dir.y() + 1.0);
 
     return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
