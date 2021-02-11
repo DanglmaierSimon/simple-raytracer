@@ -19,11 +19,11 @@ class sphere : public hittable {
   public:
     bool hit(ray const& r, double t_min, double t_max, hit_record& rec) const override;
 
-    vec3 center() const
+    constexpr vec3 center() const
     {
         return _center;
     }
-    double radius() const
+    constexpr double radius() const
     {
         return _radius;
     }
