@@ -77,8 +77,6 @@ class vec3 {
         return x() * x() + y() * y() + z() * z();
     }
 
-    void write_color(std::ostream& os, int samples_per_pixel);
-
     static vec3 random();
     static vec3 random(double min, double max);
 
