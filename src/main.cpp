@@ -3,6 +3,7 @@
 
 #include "base/hittable.h"
 #include "base/hittable_list.h"
+#include "base/ppm_image.h"
 #include "base/ray.h"
 #include "base/vec3.h"
 #include "materials/dielectric.h"
@@ -80,8 +81,6 @@ int main()
     elapsed_timer timer_total;
     timer_total.start();
 
-    std::ofstream out("image.ppm", std::ios::trunc | std::ios::out);
-
     const int img_width  = 200;
     const int img_height = 100;
 
@@ -92,6 +91,8 @@ int main()
     const int max_recursion_depth = 50;
 
     const int total_scan_lines = img_height - 1;
+
+    ppm_image image{img_width, img_height, samples_per_pixel, "image.ppm"};
 
     int scan_lines_remaining = total_scan_lines;
 
@@ -106,8 +107,6 @@ int main()
     const double aperture      = 0.1;
 
     const camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
-
-    out << "P3\n" << img_width << " " << img_height << "\n255\n";
 
     for (int j = img_height - 1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << scan_lines_remaining << " " << std::flush;
@@ -126,7 +125,8 @@ int main()
 
                 color += ray_color(r, world, max_recursion_depth);
             }
-            color.write_color(out, samples_per_pixel);
+
+            image.set_color(i, j, color);
         }
 
         scan_lines_remaining--;
@@ -134,13 +134,20 @@ int main()
         scan_line_profiler.add(timer.nsecs_elapsed());
     }
 
-    auto time = timer_total.elapsed();
+    auto const image_gen_time = timer_total.elapsed();
 
     std::cout << std::endl;
 
+    std::cout << "Writing image file..." << std::endl;
+
+    image.write_image();
+
+    auto const total_time = timer_total.elapsed();
+
     scan_line_profiler.print_profiler_stats();
 
-    std::cout << "Total time: " << util::format_time(time) << std::endl;
+    std::cout << "Image generation time: " << util::format_time(image_gen_time) << std::endl;
+    std::cout << "Total time: " << util::format_time(total_time) << std::endl;
 
     std::cout << "Done!\n";
     return 0;
