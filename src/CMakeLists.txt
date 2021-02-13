@@ -2,6 +2,7 @@ add_subdirectory(base)
 add_subdirectory(util)
 add_subdirectory(materials)
 add_subdirectory(objects)
+add_subdirectory(benchmarks)
 add_subdirectory(external/benchmark)
 
 add_executable(
@@ -42,4 +43,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                                                 "${CMAKE_BINARY_DIR}")
+                                                 "${CMAKE_BINARY_DIR}/bin")

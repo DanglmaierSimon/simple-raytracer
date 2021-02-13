@@ -14,19 +14,19 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 print_info() {
-    echo -e "${BLUE}$1${NC}"
+    echo -e "${BLUE}[ INFO ]${NC} $1"
 }
 
 print_warning() {
-    echo -e "${YELLOW}$1${NC}"
+    echo -e "${YELLOW}[ WARN ]${NC} $1"
 }
 
 print_error() {
-    echo -e "${RED}$1${NC}"
+    echo -e "${RED}[ ERROR ]${NC} $1"
 }
 
 print_success() {
-    echo -e "${GREEN}$1${NC}"
+    echo -e "${GREEN}[ SUCCESS ]${NC} $1"
 }
 
 print_info "Starting build script..."
@@ -40,10 +40,18 @@ cd "$__dir"/"$OUTPUT_DIR" || exit 255
 
 print_info "Running cmake..."
 
-cmake .. -DCMAKE_BUILD_TYPE=RELWITHDEBINFO
+cmake -S "$__dir" -B "$__dir"/"$OUTPUT_DIR" -DCMAKE_BUILD_TYPE=RELWITHDEBINFO
 
 print_info "Building target $DEFAULT_TARGET..."
 
 make $DEFAULT_TARGET -j "$(nproc)"
 
-print_success "==== BUILD SCRIPT SUCCESSFUL ===="
+print_info "Building benchmarks..."
+
+for TARGET in BenchMarkGlassSpheres BenchMarkManySpheres BenchMarkSingleSphere; do
+
+    make $TARGET -j "$(nproc)"
+
+done
+
+print_success "Build succeeded"
