@@ -114,8 +114,6 @@ static void BM_Render(benchmark::State& state)
     image.write_image();
 }
 
-BENCHMARK(BM_Render)
-    ->Unit(benchmark::kMillisecond)
-    ->ArgsProduct({{10, 20, 25, 50, 100, 200}, {5, 10, 20, 50, 100}});
+BENCHMARK(BM_Render)->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
