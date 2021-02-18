@@ -81,8 +81,8 @@ int main()
     elapsed_timer timer_total;
     timer_total.start();
 
-    const int img_width  = 200;
-    const int img_height = 100;
+    const int img_width  = 640;
+    const int img_height = 480;
 
     const int samples_per_pixel = 100;
 
