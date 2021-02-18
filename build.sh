@@ -48,10 +48,6 @@ make $DEFAULT_TARGET -j "$(nproc)"
 
 print_info "Building benchmarks..."
 
-for TARGET in BenchMarkGlassSpheres BenchMarkManySpheres BenchMarkSingleSphere; do
-
-    make $TARGET -j "$(nproc)"
-
-done
+make raytracer-benchmark -j "$(nproc)"
 
 print_success "Build succeeded"
