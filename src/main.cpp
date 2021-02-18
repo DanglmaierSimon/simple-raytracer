@@ -81,16 +81,16 @@ int main()
     elapsed_timer timer_total;
     timer_total.start();
 
-    const int img_width  = 640;
-    const int img_height = 480;
+    constexpr int img_width  = 200;
+    constexpr int img_height = 100;
 
-    const int samples_per_pixel = 100;
+    constexpr int samples_per_pixel = 100;
 
-    const double aspect_ratio = double(img_width) / img_height;
+    constexpr double aspect_ratio = double(img_width) / img_height;
 
-    const int max_recursion_depth = 50;
+    constexpr int max_recursion_depth = 50;
 
-    const int total_scan_lines = img_height - 1;
+    constexpr int total_scan_lines = img_height - 1;
 
     ppm_image image{img_width, img_height, samples_per_pixel, "image.ppm"};
 
@@ -100,11 +100,11 @@ int main()
 
     const auto world = random_scene();
 
-    const vec3   lookfrom(13, 2, 3);
-    const vec3   lookat(0, 0, 0);
-    const vec3   vup(0, 1, 0);
-    const double dist_to_focus = 10.0;
-    const double aperture      = 0.1;
+    constexpr vec3   lookfrom(13, 2, 3);
+    constexpr vec3   lookat(0, 0, 0);
+    constexpr vec3   vup(0, 1, 0);
+    constexpr double dist_to_focus = 10.0;
+    constexpr double aperture      = 0.1;
 
     const camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
