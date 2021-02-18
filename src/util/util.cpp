@@ -47,8 +47,14 @@ double util::random_double(double min, double max)
 
 double util::random_double()
 {
-    static std::random_device                     rand_dev;
-    static std::mt19937                           generator(rand_dev());
+#ifdef USE_FIXED_RANDOM
+    // Use fixed randomness for benchmarks
+    static std::mt19937 generator(0);
+#else
+    static std::random_device rand_dev;
+    static std::mt19937       generator(rand_dev());
+#endif
+
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
     return distribution(generator);
