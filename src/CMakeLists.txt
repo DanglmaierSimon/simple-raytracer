@@ -5,10 +5,7 @@ add_subdirectory(objects)
 add_subdirectory(benchmarks)
 add_subdirectory(external/benchmark)
 
-add_executable(
-  ${PROJECT_NAME}
-  main.cpp
-)
+add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} util materials base objects)
 

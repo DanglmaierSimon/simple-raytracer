@@ -8,4 +8,3 @@ set(SOURCES util.cpp profiler.cpp)
 add_library(${LIB_NAME} SHARED ${HEADERS} ${SOURCES})
 
 target_include_directories(${LIB_NAME} PUBLIC .)
-
