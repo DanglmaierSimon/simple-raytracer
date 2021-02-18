@@ -14,21 +14,21 @@ class vec3 {
     }
 
     constexpr vec3(double e0, double e1, double e2)
-        : d{e0, e1, e2}
+        : _d{e0, e1, e2}
     {
     }
 
     constexpr double x() const
     {
-        return d[0];
+        return _d[0];
     }
     constexpr double y() const
     {
-        return d[1];
+        return _d[1];
     }
     constexpr double z() const
     {
-        return d[2];
+        return _d[2];
     }
 
     constexpr vec3 operator-() const
@@ -38,27 +38,27 @@ class vec3 {
 
     constexpr double operator[](int i) const
     {
-        return d[i];
+        return _d[i];
     }
     constexpr double& operator[](int i)
     {
-        return d[i];
+        return _d[i];
     }
 
     constexpr vec3& operator+=(vec3 const& v)
     {
-        d[0] += v.x();
-        d[1] += v.y();
-        d[2] += v.z();
+        _d[0] += v.x();
+        _d[1] += v.y();
+        _d[2] += v.z();
 
         return *this;
     }
 
     constexpr vec3& operator*=(double t)
     {
-        d[0] *= t;
-        d[1] *= t;
-        d[2] *= t;
+        _d[0] *= t;
+        _d[1] *= t;
+        _d[2] *= t;
         return *this;
     }
 
@@ -81,7 +81,7 @@ class vec3 {
     static vec3 random(double min, double max);
 
   private:
-    double d[3];
+    double _d[3];
 };
 
 inline std::ostream& operator<<(std::ostream& os, vec3 const& v)
