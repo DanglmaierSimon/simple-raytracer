@@ -108,25 +108,25 @@ int main()
 
     const camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
-    for (int j = img_height - 1; j >= 0; --j) {
+    for (int y = 0; y < img_height; y++) {
         std::cerr << "\rScanlines remaining: " << scan_lines_remaining << " " << std::flush;
 
         elapsed_timer timer;
         timer.start();
 
-        for (int i = 0; i < img_width; i++) {
+        for (int x = 0; x < img_width; x++) {
             vec3 color(0, 0, 0);
 
             for (int s = 0; s < samples_per_pixel; s++) {
-                const auto u = (i + util::random_double()) / img_width;
-                const auto v = (j + util::random_double()) / img_height;
+                const auto u = (x + util::random_double()) / img_width;
+                const auto v = (y + util::random_double()) / img_height;
 
                 const ray r = cam.get_ray(u, v);
 
                 color += ray_color(r, world, max_recursion_depth);
             }
 
-            image.set_color(i, j, color);
+            image.set_color(x, y, color);
         }
 
         scan_lines_remaining--;
