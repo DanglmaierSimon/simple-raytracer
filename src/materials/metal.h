@@ -5,7 +5,7 @@
 
 class metal : public material {
   public:
-    constexpr metal(vec3 const& a, double f)
+    constexpr metal(vec3 const& a, double f) noexcept
         : _albedo{a}
         , _fuzz{f < 1 ? f : 1}
     {

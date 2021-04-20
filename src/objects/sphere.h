@@ -9,7 +9,7 @@
 class sphere : public hittable {
 
   public:
-    sphere(vec3 center, double radius, std::shared_ptr<material> m)
+    sphere(vec3 center, double radius, std::shared_ptr<material> m) noexcept
         : _center{center}
         , _radius{radius}
         , _mat_ptr{std::move(m)}

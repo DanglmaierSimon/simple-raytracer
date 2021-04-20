@@ -5,7 +5,7 @@
 
 class lambertian : public material {
   public:
-    explicit constexpr lambertian(vec3 const& a)
+    explicit constexpr lambertian(vec3 const& a) noexcept
         : _albedo{a}
     {
     }

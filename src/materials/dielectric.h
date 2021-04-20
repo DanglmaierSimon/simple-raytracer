@@ -8,7 +8,7 @@
 
 class dielectric : public material {
   public:
-    explicit constexpr dielectric(double ri)
+    explicit constexpr dielectric(double ri) noexcept
         : _ref_idx{ri} {};
 
     bool scatter(ray const&        r_in,
