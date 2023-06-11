@@ -5,7 +5,11 @@
 #![warn(clippy::cargo)]
 
 pub mod camera;
+pub mod dielectric;
 pub mod hittable;
+pub mod lambertian;
+pub mod material;
+pub mod metal;
 pub mod ray;
 pub mod sphere;
 pub mod utils;
@@ -24,7 +28,10 @@ use vec3::Vec3;
 
 use crate::{
     camera::Camera,
+    dielectric::Dielectric,
     hittable::HittableList,
+    lambertian::Lambertian,
+    metal::Metal,
     sphere::Sphere,
     utils::write_color,
     vec3::{Color, Point3},
@@ -39,8 +46,16 @@ fn ray_color(r: Ray, world: &impl Hittable, depth: u64) -> Color {
     }
 
     if world.hit(r, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
-        return 0.5 * ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1);
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+
+        let material = rec.mat.clone().unwrap();
+
+        if material.scatter(r, &rec, &mut attenuation, &mut scattered) {
+            return attenuation * ray_color(scattered, world, depth - 1);
+        } else {
+            return Color::new(0.0, 0.0, 0.0);
+        }
     }
 
     let unit_dir = Vec3::unit_vector(r.direction());
@@ -49,20 +64,41 @@ fn ray_color(r: Ray, world: &impl Hittable, depth: u64) -> Color {
 }
 
 fn main() {
-    // image data
+    // image da
     let aspect_ratio = 16.0 / 9.0;
-    let img_width = 400;
+    let img_width = 800;
     let img_height = (img_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 100;
-    let max_depth = 50;
+    let samples_per_pixel = 200;
+    let max_depth = 100;
 
     // camera
     let cam = Camera::new();
 
     // world
+
+    let ground = Rc::new(Lambertian {
+        albedo: Color::new(0.8, 0.8, 0.0),
+    });
+    let center = Rc::new(Lambertian {
+        albedo: Color::new(0.1, 0.2, 0.5),
+    });
+    let left = Rc::new(Dielectric::new(1.5));
+    let right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+
     let world = HittableList::new(vec![
-        Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)),
-        Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)),
+        Rc::new(Sphere::new(
+            Point3::new(0.0, -100.5, -1.0),
+            100.0,
+            ground.clone(),
+        )),
+        Rc::new(Sphere::new(
+            Point3::new(0.0, 0.0, -1.0),
+            0.5,
+            center.clone(),
+        )),
+        Rc::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, left.clone())),
+        Rc::new(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, right.clone())),
+        Rc::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), -0.4, left.clone())),
     ]);
 
     // render

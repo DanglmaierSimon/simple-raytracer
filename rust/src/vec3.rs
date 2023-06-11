@@ -86,6 +86,22 @@ impl Vec3 {
             return -in_unit_sphere;
         }
     }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        (self.x().abs() < s) && (self.y().abs() < s) && (self.z().abs() < s)
+    }
+
+    pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+        v - (2.0 * Vec3::dot(v, n)) * n
+    }
+
+    pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = f64::min(Vec3::dot(-uv, n), 1.0);
+        let r_out_perp = etai_over_etat * (uv + cos_theta*n);
+        let r_out_parllel = -((1.0 - r_out_perp.length_squared()).abs()).sqrt() * n;
+        r_out_perp + r_out_parllel
+    }
 }
 
 impl Default for Vec3 {

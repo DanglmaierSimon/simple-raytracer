@@ -1,20 +1,44 @@
 use std::rc::Rc;
 
 use crate::{
+    material::Material,
     ray::Ray,
-    vec3::{ Point3, Vec3},
+    vec3::{Point3, Vec3},
 };
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
+    pub mat: Option<Rc<dyn Material>>,
 
     front_face: bool,
 }
 
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self {
+            p: Default::default(),
+            normal: Default::default(),
+            t: Default::default(),
+            mat: Default::default(),
+            front_face: Default::default(),
+        }
+    }
+}
+
 impl HitRecord {
+    pub fn new(mat: Rc<dyn Material>) -> Self {
+        Self {
+            p: Point3::new(0.0, 0.0, 0.0),
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            t: 0.0,
+            front_face: false,
+            mat: Some(mat),
+        }
+    }
+
     pub fn set_front_face(&mut self, r: Ray, outward_normal: Vec3) {
         self.front_face = Vec3::dot(r.direction(), outward_normal) < 0.0;
         self.normal = if self.front_face() {
@@ -26,17 +50,6 @@ impl HitRecord {
 
     pub fn front_face(&self) -> bool {
         self.front_face
-    }
-}
-
-impl Default for HitRecord {
-    fn default() -> Self {
-        Self {
-            p: Point3::new(0.0, 0.0, 0.0),
-            normal: Vec3::new(0.0, 0.0, 0.0),
-            t: 0.0,
-            front_face: false,
-        }
     }
 }
 
@@ -64,7 +77,7 @@ impl HittableList {
 
 impl Hittable for HittableList {
     fn hit(&self, r: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let mut temp_rec: HitRecord = HitRecord::default();
+        let mut temp_rec =  HitRecord::default();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
@@ -72,7 +85,7 @@ impl Hittable for HittableList {
             if obj.hit(r, t_min, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+                *rec = temp_rec.clone();
             }
         }
         return hit_anything;
