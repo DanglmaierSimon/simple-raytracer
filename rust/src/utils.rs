@@ -10,7 +10,7 @@ pub fn deg_to_rad(degrees: f64) -> f64 {
 pub fn write_color(
     out: &mut impl Write,
     pixel_color: Color,
-    samples_per_pixel: u32,
+    samples_per_pixel: usize,
 ) -> std::io::Result<()> {
     let (mut r, mut g, mut b) = (pixel_color.x(), pixel_color.y(), pixel_color.z());
 

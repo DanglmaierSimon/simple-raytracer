@@ -18,7 +18,8 @@ pub mod vec3;
 use std::{
     f64::INFINITY,
     io::{self, Write},
-    rc::Rc,
+    sync::Arc,
+    thread::scope,
 };
 
 use hittable::{HitRecord, Hittable};
@@ -32,11 +33,13 @@ use crate::{
     metal::Metal, sphere::Sphere, utils::write_color, vec3::Color,
 };
 
-fn random_scene() -> HittableList {
+const samples_per_pixel: usize = 500;
+
+fn random_scene() -> Arc<HittableList> {
     let mut world = HittableList::default();
 
-    let ground_material = Rc::new(Lambertian::new(Vec3(0.5, 0.5, 0.5)));
-    world.add(Rc::new(Sphere::new(
+    let ground_material = Arc::new(Lambertian::new(Vec3(0.5, 0.5, 0.5)));
+    world.add(Arc::new(Sphere::new(
         Vec3(0.0, -1000.0, 0.0),
         1000.0,
         ground_material.clone(),
@@ -53,47 +56,47 @@ fn random_scene() -> HittableList {
             );
 
             if (center - Vec3(4.0, 0.2, 0.0)).length() > 0.9 {
-                let sphere_material: Rc<dyn Material>;
+                let sphere_material: Arc<dyn Material>;
 
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random_vec() * Color::random_vec();
-                    sphere_material = Rc::new(Lambertian::new(albedo));
-                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                    sphere_material = Arc::new(Lambertian::new(albedo));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random(0.5, 1.0);
                     let fuzz = thread_rng().gen_range(0.0..0.5);
-                    sphere_material = Rc::new(Metal::new(albedo, fuzz));
-                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                    sphere_material = Arc::new(Metal::new(albedo, fuzz));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     // glass
-                    sphere_material = Rc::new(Dielectric::new(1.5));
-                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                    sphere_material = Arc::new(Dielectric::new(1.5));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 }
             }
         }
     }
 
     {
-        let material = Rc::new(Dielectric::new(1.5));
-        world.add(Rc::new(Sphere::new(Vec3(0.0, 1.0, 0.0), 1.0, material)));
+        let material = Arc::new(Dielectric::new(1.5));
+        world.add(Arc::new(Sphere::new(Vec3(0.0, 1.0, 0.0), 1.0, material)));
     }
 
     {
-        let material = Rc::new(Lambertian::new(Vec3(0.4, 0.2, 0.1)));
-        world.add(Rc::new(Sphere::new(Vec3(-4.0, 1.0, 0.0), 1.0, material)));
+        let material = Arc::new(Lambertian::new(Vec3(0.4, 0.2, 0.1)));
+        world.add(Arc::new(Sphere::new(Vec3(-4.0, 1.0, 0.0), 1.0, material)));
     }
 
     {
-        let material = Rc::new(Metal::new(Vec3(0.7, 0.6, 0.5), 0.0));
-        world.add(Rc::new(Sphere::new(Vec3(4.0, 1.0, 0.0), 1.0, material)));
+        let material = Arc::new(Metal::new(Vec3(0.7, 0.6, 0.5), 0.0));
+        world.add(Arc::new(Sphere::new(Vec3(4.0, 1.0, 0.0), 1.0, material)));
     }
 
-    return world;
+    return Arc::new(world);
 }
 
-fn ray_color(r: Ray, world: &impl Hittable, depth: u32) -> Color {
+fn ray_color(r: Ray, world: Arc<dyn Hittable>, depth: u32) -> Color {
     let mut rec = HitRecord::default();
 
     // if we exceed the ray bounce limit, no more light is gathered
@@ -121,38 +124,88 @@ fn ray_color(r: Ray, world: &impl Hittable, depth: u32) -> Color {
 
 // TODO: parallelize with threadpools
 // TODO: Return a struct of pixel idx & pixel color here!
-// fn calculate_single_pixel(
-//     samples_per_pixel: u32,
-//     i: u32,
-//     j: u32,
-//     img_width: u32,
-//     img_height: u32,
-//     world: &impl Hittable,
-//     max_depth: u32,
-//     cam: &Camera,
-// ) -> Color {
-//     let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-//     let mut rng = thread_rng();
-//     for _ in 0..samples_per_pixel {
-//         let r1: f64 = rng.gen();
-//         let r2: f64 = rng.gen();
+fn calculate_single_pixel(
+    i: usize,
+    j: usize,
+    img_width: usize,
+    img_height: usize,
+    world: Arc<dyn Hittable>,
+    max_depth: u32,
+    cam: &Camera,
+    counter: usize,
+) -> result {
+    let mut pixel_color = Vec3(0.0, 0.0, 0.0);
+    let mut rng = thread_rng();
+    for _ in 0..samples_per_pixel {
+        let r1: f64 = rng.gen();
+        let r2: f64 = rng.gen();
 
-//         let u = (i as f64 + r1) / (img_width - 1) as f64;
-//         let v = (j as f64 + r2) / (img_height - 1) as f64;
+        let u = (i as f64 + r1) / (img_width - 1) as f64;
+        let v = (j as f64 + r2) / (img_height - 1) as f64;
 
-//         let r = cam.get_ray(u, v);
-//         pixel_color += ray_color(r, world, max_depth);
-//     }
-//     return pixel_color;
-// }
+        let r = cam.get_ray(u, v);
+        pixel_color += ray_color(r, world.clone(), max_depth);
+    }
+    return result(counter, pixel_color);
+}
+
+struct result(pub usize, pub Color);
+
+fn calculate_all_pixels(
+    img_width: usize,
+    img_height: usize,
+    world: Arc<dyn Hittable>,
+    cam: Camera,
+) -> Vec<result> {
+    let mut counter: usize = 0;
+
+    let max_depth = 100;
+
+    let mut res = Vec::new();
+
+    scope(|s| {
+        let mut threads = Vec::new();
+
+        for j in (0..img_height - 1).rev() {
+            eprint!("\rScanlines remaining: {:0>5}", j);
+            io::stderr().flush().unwrap();
+            for i in 0..img_width {
+                counter += 1;
+
+                let world = world.clone();
+                let cam = cam.clone();
+
+                let t = s.spawn(move || {
+                    let c = cam.clone();
+                    calculate_single_pixel(
+                        i, j, img_width, img_height, world, max_depth, &c, counter,
+                    )
+                });
+                threads.push(t);
+            }
+        }
+
+        for tres in threads {
+            res.push(tres.join().unwrap());
+        }
+    });
+
+    return res;
+}
+
+fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
+    println!("P3\n{} {}\n255\n", img_width, img_height);
+
+    for pixel_color in pixels {
+        write_color(&mut std::io::stdout(), pixel_color, samples_per_pixel).unwrap();
+    }
+}
 
 fn main() {
     // image da
     let aspect_ratio = 3.0 / 2.0;
-    let img_width = 1200;
-    let img_height = (img_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 500;
-    let max_depth = 100;
+    let img_width: usize = 1200;
+    let img_height: usize = (img_width as f64 / aspect_ratio) as usize;
 
     // world
     let world = random_scene();
@@ -175,27 +228,13 @@ fn main() {
     );
 
     // render
-    let mut rng = rand::thread_rng();
-    println!("P3\n{} {}\n255\n", img_width, img_height);
+    let mut pixels = calculate_all_pixels(img_width, img_height, world, cam);
 
-    for j in (0..img_height - 1).rev() {
-        eprint!("\rScanlines remaining: {:0>5}", j);
-        io::stderr().flush().unwrap();
-        for i in 0..img_width {
-            let mut pixel_color = Vec3(0.0, 0.0, 0.0);
-            for _ in 0..samples_per_pixel {
-                let r1: f64 = rng.gen();
-                let r2: f64 = rng.gen();
+    pixels.sort_by(|lhs, rhs| lhs.0.cmp(&rhs.0));
 
-                let u = (i as f64 + r1) / (img_width - 1) as f64;
-                let v = (j as f64 + r2) / (img_height - 1) as f64;
+    let r: Vec<Color> = pixels.iter().map(|elem| elem.1).collect();
 
-                let r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, &world, max_depth);
-            }
-            write_color(&mut std::io::stdout(), pixel_color, samples_per_pixel).unwrap();
-        }
-    }
+    write_colors(r, img_width, img_height);
 
     eprintln!("\nDone!");
 }

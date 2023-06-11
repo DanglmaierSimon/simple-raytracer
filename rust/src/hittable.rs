@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{ sync::Arc};
 
 use crate::{
     material::Material,
@@ -11,7 +11,7 @@ pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
-    pub mat: Option<Rc<dyn Material>>,
+    pub mat: Option<Arc<dyn Material>>,
 
     front_face: bool,
 }
@@ -29,7 +29,7 @@ impl Default for HitRecord {
 }
 
 impl HitRecord {
-    pub fn new(mat: Rc<dyn Material>) -> Self {
+    pub fn new(mat: Arc<dyn Material>) -> Self {
         Self {
             p: Vec3(0.0, 0.0, 0.0),
             normal: Vec3(0.0, 0.0, 0.0),
@@ -53,17 +53,17 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Send + Sync {
     fn hit(&self, r: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }
 
 #[derive(Default)]
 pub struct HittableList {
-    objects: Vec<Rc<dyn Hittable>>,
+    objects: Vec<Arc<dyn Hittable>>,
 }
 
 impl HittableList {
-    pub fn new(objects: Vec<Rc<dyn Hittable>>) -> Self {
+    pub fn new(objects: Vec<Arc<dyn Hittable>>) -> Self {
         Self { objects }
     }
 
@@ -71,7 +71,7 @@ impl HittableList {
         self.objects.clear();
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object)
     }
 }
