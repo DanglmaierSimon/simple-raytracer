@@ -84,3 +84,6 @@ cmake-build-*/*
 .idea/raytracer.iml
 .idea/vcs.xml
 .idea/codeStyles/codeStyleConfig.xml
+
+# clandg cache
+.cache
