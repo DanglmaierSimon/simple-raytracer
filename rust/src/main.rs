@@ -28,22 +28,16 @@ use ray::Ray;
 use vec3::Vec3;
 
 use crate::{
-    camera::Camera,
-    dielectric::Dielectric,
-    hittable::HittableList,
-    lambertian::Lambertian,
-    metal::Metal,
-    sphere::Sphere,
-    utils::write_color,
-    vec3::{Color, Point3},
+    camera::Camera, dielectric::Dielectric, hittable::HittableList, lambertian::Lambertian,
+    metal::Metal, sphere::Sphere, utils::write_color, vec3::Color,
 };
 
 fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
-    let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_material = Rc::new(Lambertian::new(Vec3(0.5, 0.5, 0.5)));
     world.add(Rc::new(Sphere::new(
-        Point3::new(0.0, -1000.0, 0.0),
+        Vec3(0.0, -1000.0, 0.0),
         1000.0,
         ground_material.clone(),
     )));
@@ -52,13 +46,13 @@ fn random_scene() -> HittableList {
         for b in -11..11 {
             let choose_mat: f64 = thread_rng().gen();
 
-            let center = Point3::new(
+            let center = Vec3(
                 (a as f64) + 0.9 * thread_rng().gen::<f64>(),
                 0.2,
                 (b as f64) + 0.9 * thread_rng().gen::<f64>(),
             );
 
-            if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+            if (center - Vec3(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_material: Rc<dyn Material>;
 
                 if choose_mat < 0.8 {
@@ -83,40 +77,28 @@ fn random_scene() -> HittableList {
 
     {
         let material = Rc::new(Dielectric::new(1.5));
-        world.add(Rc::new(Sphere::new(
-            Point3::new(0.0, 1.0, 0.0),
-            1.0,
-            material,
-        )));
+        world.add(Rc::new(Sphere::new(Vec3(0.0, 1.0, 0.0), 1.0, material)));
     }
 
     {
-        let material = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-        world.add(Rc::new(Sphere::new(
-            Point3::new(-4.0, 1.0, 0.0),
-            1.0,
-            material,
-        )));
+        let material = Rc::new(Lambertian::new(Vec3(0.4, 0.2, 0.1)));
+        world.add(Rc::new(Sphere::new(Vec3(-4.0, 1.0, 0.0), 1.0, material)));
     }
 
     {
-        let material = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-        world.add(Rc::new(Sphere::new(
-            Point3::new(4.0, 1.0, 0.0),
-            1.0,
-            material,
-        )));
+        let material = Rc::new(Metal::new(Vec3(0.7, 0.6, 0.5), 0.0));
+        world.add(Rc::new(Sphere::new(Vec3(4.0, 1.0, 0.0), 1.0, material)));
     }
 
     return world;
 }
 
-fn ray_color(r: Ray, world: &impl Hittable, depth: u64) -> Color {
+fn ray_color(r: Ray, world: &impl Hittable, depth: u32) -> Color {
     let mut rec = HitRecord::default();
 
     // if we exceed the ray bounce limit, no more light is gathered
     if depth <= 0 {
-        return Color::new(0.0, 0.0, 0.0);
+        return Vec3(0.0, 0.0, 0.0);
     }
 
     if world.hit(r, 0.001, INFINITY, &mut rec) {
@@ -128,14 +110,41 @@ fn ray_color(r: Ray, world: &impl Hittable, depth: u64) -> Color {
         if material.scatter(r, &rec, &mut attenuation, &mut scattered) {
             return attenuation * ray_color(scattered, world, depth - 1);
         } else {
-            return Color::new(0.0, 0.0, 0.0);
+            return Vec3(0.0, 0.0, 0.0);
         }
     }
 
     let unit_dir = Vec3::unit_vector(r.direction());
     let t = 0.5 * (unit_dir.y() + 1.0);
-    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+    (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0)
 }
+
+// TODO: parallelize with threadpools
+// TODO: Return a struct of pixel idx & pixel color here!
+// fn calculate_single_pixel(
+//     samples_per_pixel: u32,
+//     i: u32,
+//     j: u32,
+//     img_width: u32,
+//     img_height: u32,
+//     world: &impl Hittable,
+//     max_depth: u32,
+//     cam: &Camera,
+// ) -> Color {
+//     let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+//     let mut rng = thread_rng();
+//     for _ in 0..samples_per_pixel {
+//         let r1: f64 = rng.gen();
+//         let r2: f64 = rng.gen();
+
+//         let u = (i as f64 + r1) / (img_width - 1) as f64;
+//         let v = (j as f64 + r2) / (img_height - 1) as f64;
+
+//         let r = cam.get_ray(u, v);
+//         pixel_color += ray_color(r, world, max_depth);
+//     }
+//     return pixel_color;
+// }
 
 fn main() {
     // image da
@@ -149,9 +158,9 @@ fn main() {
     let world = random_scene();
 
     // camera
-    let lookfrom = Point3::new(13.0, 2.0, 3.0);
-    let lookat = Point3::new(0.0, 0.0, 0.0);
-    let vup = Point3::new(0.0, 1.0, 0.0);
+    let lookfrom = Vec3(13.0, 2.0, 3.0);
+    let lookat = Vec3(0.0, 0.0, 0.0);
+    let vup = Vec3(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;
 
@@ -173,7 +182,7 @@ fn main() {
         eprint!("\rScanlines remaining: {:0>5}", j);
         io::stderr().flush().unwrap();
         for i in 0..img_width {
-            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            let mut pixel_color = Vec3(0.0, 0.0, 0.0);
             for _ in 0..samples_per_pixel {
                 let r1: f64 = rng.gen();
                 let r2: f64 = rng.gen();

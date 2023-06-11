@@ -7,7 +7,6 @@ use crate::{
     vec3::{Color, Vec3},
 };
 
-
 #[derive(Debug, Clone, Copy)]
 pub struct Dielectric {
     ir: f64, // index of refraction
@@ -27,7 +26,7 @@ impl Material for Dielectric {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        *attenuation = Color::new(1.0, 1.0, 1.0);
+        *attenuation = Vec3(1.0, 1.0, 1.0);
         let refraction_ratio = if rec.front_face() {
             1.0 / self.ir
         } else {

@@ -31,8 +31,8 @@ impl Default for HitRecord {
 impl HitRecord {
     pub fn new(mat: Rc<dyn Material>) -> Self {
         Self {
-            p: Point3::new(0.0, 0.0, 0.0),
-            normal: Vec3::new(0.0, 0.0, 0.0),
+            p: Vec3(0.0, 0.0, 0.0),
+            normal: Vec3(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
             mat: Some(mat),
@@ -78,7 +78,7 @@ impl HittableList {
 
 impl Hittable for HittableList {
     fn hit(&self, r: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let mut temp_rec =  HitRecord::default();
+        let mut temp_rec = HitRecord::default();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
