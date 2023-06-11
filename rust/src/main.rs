@@ -122,8 +122,6 @@ fn ray_color(r: Ray, world: Arc<dyn Hittable>, depth: u32) -> Color {
     (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0)
 }
 
-// TODO: parallelize with threadpools
-// TODO: Return a struct of pixel idx & pixel color here!
 fn calculate_single_pixel(
     i: usize,
     j: usize,
@@ -218,6 +216,9 @@ fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
 }
 
 fn main() {
+
+    todo!("Change the parallelization to be on scanline level, not on pixel level");
+
     // image da
     let aspect_ratio = 16.0 / 9.0;
     let img_width: usize = 800;
