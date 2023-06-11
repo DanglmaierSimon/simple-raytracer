@@ -71,35 +71,70 @@ fn main() {
     let samples_per_pixel = 200;
     let max_depth = 100;
 
-    // camera
-    let cam = Camera::new();
-
     // world
+    // let r = (std::f64::consts::PI / 4.0).cos();
 
-    let ground = Rc::new(Lambertian {
-        albedo: Color::new(0.8, 0.8, 0.0),
-    });
-    let center = Rc::new(Lambertian {
-        albedo: Color::new(0.1, 0.2, 0.5),
-    });
-    let left = Rc::new(Dielectric::new(1.5));
-    let right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+    //
 
-    let world = HittableList::new(vec![
-        Rc::new(Sphere::new(
-            Point3::new(0.0, -100.5, -1.0),
-            100.0,
-            ground.clone(),
-        )),
-        Rc::new(Sphere::new(
-            Point3::new(0.0, 0.0, -1.0),
-            0.5,
-            center.clone(),
-        )),
-        Rc::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, left.clone())),
-        Rc::new(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, right.clone())),
-        Rc::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), -0.4, left.clone())),
-    ]);
+    // let material_left = Rc::new(Lambertian {
+    //     albedo: Color::new(0.0, 0.0, 1.0),
+    // });
+    // let material_right = Rc::new(Lambertian {
+    //     albedo: Color::new(1.0, 0.0, 0.0),
+    // });
+
+    // world.add(Rc::new(Sphere::new(
+    //     Point3::new(-r, 0.0, -1.0),
+    //     r,
+    //     material_left,
+    // )));
+    // world.add(Rc::new(Sphere::new(
+    //     Point3::new(r, 0.0, -1.0),
+    //     r,
+    //     material_right,
+    // )));
+
+    let mut world = HittableList::default();
+
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_left = Rc::new(Dielectric::new(1.5));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        material_left.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right.clone(),
+    )));
+
+    // camera
+    let cam = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        aspect_ratio,
+    );
 
     // render
     let mut rng = rand::thread_rng();

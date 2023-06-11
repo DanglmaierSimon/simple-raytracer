@@ -57,6 +57,7 @@ pub trait Hittable {
     fn hit(&self, r: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }
 
+#[derive(Default)]
 pub struct HittableList {
     objects: Vec<Rc<dyn Hittable>>,
 }
