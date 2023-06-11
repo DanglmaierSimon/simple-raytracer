@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o pipefail
+set -eou pipefail
 
 # Set magic variables for current file & dir
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,10 +43,10 @@ cmake -S "$__dir" -B "$__dir"/"$OUTPUT_DIR" -DCMAKE_BUILD_TYPE=RELWITHDEBINFO
 
 print_info "Building target $DEFAULT_TARGET..."
 
-make $DEFAULT_TARGET -j "$(nproc)"
+cmake --build $DEFAULT_TARGET
 
 print_info "Building benchmarks..."
 
-make raytracer-benchmark -j "$(nproc)"
+cmake --build raytracer-benchmark
 
 print_success "Build succeeded"
