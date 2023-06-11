@@ -39,14 +39,14 @@ cd "$__dir"/"$OUTPUT_DIR" || exit 255
 
 print_info "Running cmake..."
 
-cmake -S "$__dir" -B "$__dir"/"$OUTPUT_DIR" -DCMAKE_BUILD_TYPE=RELWITHDEBINFO
+cmake -S "$__dir" -B "$__dir"/"$OUTPUT_DIR" -DCMAKE_BUILD_TYPE=RELWITHDEBINFO -G Ninja
 
 print_info "Building target $DEFAULT_TARGET..."
 
-cmake --build $DEFAULT_TARGET
+cmake --build . --target $DEFAULT_TARGET
 
 print_info "Building benchmarks..."
 
-cmake --build raytracer-benchmark
+cmake --build . --target raytracer-benchmark
 
 print_success "Build succeeded"
