@@ -17,15 +17,15 @@ pub mod vec3;
 
 use std::{
     f64::INFINITY,
-    io::{self, Write},
-    sync::Arc,
-    thread::scope,
+    io::Write,
+    sync::{mpsc::channel, Arc},
 };
 
 use hittable::{HitRecord, Hittable};
 use material::Material;
 use rand::{thread_rng, Rng};
 use ray::Ray;
+use threadpool::ThreadPool;
 use vec3::Vec3;
 
 use crate::{
@@ -33,7 +33,7 @@ use crate::{
     metal::Metal, sphere::Sphere, utils::write_color, vec3::Color,
 };
 
-const samples_per_pixel: usize = 500;
+const samples_per_pixel: usize = 200;
 
 fn random_scene() -> Arc<HittableList> {
     let mut world = HittableList::default();
@@ -133,7 +133,7 @@ fn calculate_single_pixel(
     max_depth: u32,
     cam: &Camera,
     counter: usize,
-) -> result {
+) -> Result {
     let mut pixel_color = Vec3(0.0, 0.0, 0.0);
     let mut rng = thread_rng();
     for _ in 0..samples_per_pixel {
@@ -146,51 +146,67 @@ fn calculate_single_pixel(
         let r = cam.get_ray(u, v);
         pixel_color += ray_color(r, world.clone(), max_depth);
     }
-    return result(counter, pixel_color);
+    return Result(counter, pixel_color);
 }
 
-struct result(pub usize, pub Color);
+#[derive(Copy, Clone)]
+struct Result(pub usize, pub Color);
+
+enum ThreadStatus {
+    Started,
+    Finished,
+}
 
 fn calculate_all_pixels(
     img_width: usize,
     img_height: usize,
     world: Arc<dyn Hittable>,
     cam: Camera,
-) -> Vec<result> {
+) -> Vec<Result> {
     let mut counter: usize = 0;
+    let max_depth = 50;
 
-    let max_depth = 100;
+    let n_workers = 16;
+    let pool = ThreadPool::new(n_workers);
 
-    let mut res = Vec::new();
+    let (status_tx, status_rx) = channel::<ThreadStatus>();
+    let (tx, rx) = channel::<Result>();
 
-    scope(|s| {
-        let mut threads = Vec::new();
+    for j in (0..img_height - 1).rev() {
+        for i in 0..img_width {
+            let world = world.clone();
+            let cam = cam.clone();
+            let tx = tx.clone();
+            let status_tx = status_tx.clone();
+            counter += 1;
+            status_tx.send(ThreadStatus::Started).unwrap();
 
-        for j in (0..img_height - 1).rev() {
-            eprint!("\rScanlines remaining: {:0>5}", j);
-            io::stderr().flush().unwrap();
-            for i in 0..img_width {
-                counter += 1;
+            pool.execute(move || {
+                let px = calculate_single_pixel(
+                    i, j, img_width, img_height, world, max_depth, &cam, counter,
+                );
 
-                let world = world.clone();
-                let cam = cam.clone();
-
-                let t = s.spawn(move || {
-                    let c = cam.clone();
-                    calculate_single_pixel(
-                        i, j, img_width, img_height, world, max_depth, &c, counter,
-                    )
-                });
-                threads.push(t);
-            }
+                tx.send(px).unwrap();
+                status_tx.send(ThreadStatus::Finished).unwrap();
+            });
         }
+    }
 
-        for tres in threads {
-            res.push(tres.join().unwrap());
-        }
+    drop(tx);
+    drop(status_tx);
+
+    let mut remaining_pixels = 0;
+
+    status_rx.iter().for_each(|v| {
+        match v {
+            ThreadStatus::Started => remaining_pixels += 1,
+            ThreadStatus::Finished => remaining_pixels -= 1,
+        };
+        eprint!("\rPixels remaining: {:0>8}", remaining_pixels);
+        std::io::stderr().flush().unwrap();
     });
 
-    return res;
+    return rx.iter().collect();
 }
 
 fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
@@ -203,8 +219,8 @@ fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
 
 fn main() {
     // image da
-    let aspect_ratio = 3.0 / 2.0;
-    let img_width: usize = 1200;
+    let aspect_ratio = 16.0 / 9.0;
+    let img_width: usize = 800;
     let img_height: usize = (img_width as f64 / aspect_ratio) as usize;
 
     // world
