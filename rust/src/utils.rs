@@ -21,9 +21,9 @@ pub fn write_color(
     b = (scale * b).sqrt();
 
     // write translated [0,255] value of each color component
-    write!(
+    writeln!(
         out,
-        "{} {} {}\n",
+        "{} {} {}",
         (256.0 * clamp(r, 0.0, 0.999)) as u8,
         (256.0 * clamp(g, 0.0, 0.999)) as u8,
         (256.0 * clamp(b, 0.0, 0.999)) as u8

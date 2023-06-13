@@ -1,4 +1,4 @@
-use std::{ sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     material::Material,
@@ -6,7 +6,7 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
@@ -14,18 +14,6 @@ pub struct HitRecord {
     pub mat: Option<Arc<dyn Material>>,
 
     front_face: bool,
-}
-
-impl Default for HitRecord {
-    fn default() -> Self {
-        Self {
-            p: Default::default(),
-            normal: Default::default(),
-            t: Default::default(),
-            mat: Default::default(),
-            front_face: Default::default(),
-        }
-    }
 }
 
 impl HitRecord {
@@ -89,6 +77,6 @@ impl Hittable for HittableList {
                 *rec = temp_rec.clone();
             }
         }
-        return hit_anything;
+        hit_anything
     }
 }

@@ -75,9 +75,9 @@ impl Vec3 {
     pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
         let in_unit_sphere = Vec3::random_in_unit_sphere();
         if Vec3::dot(in_unit_sphere, normal) > 0.0 {
-            return in_unit_sphere;
+            in_unit_sphere
         } else {
-            return -in_unit_sphere;
+            -in_unit_sphere
         }
     }
 
@@ -136,7 +136,7 @@ impl ops::MulAssign<f64> for Vec3 {
 
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
-        *self *= (1 as f64) / rhs
+        *self *= 1.0 / rhs
     }
 }
 
@@ -184,7 +184,7 @@ impl ops::Div<f64> for Vec3 {
     type Output = Vec3;
 
     fn div(self, rhs: f64) -> Self::Output {
-        (1 as f64 / rhs) * self
+        (1.0 / rhs) * self
     }
 }
 

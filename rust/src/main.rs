@@ -32,7 +32,7 @@ use crate::{
     metal::Metal, sphere::Sphere, utils::write_color, vec3::Color,
 };
 
-const samples_per_pixel: usize = 200;
+const SAMPLES_PER_PIXEL: usize = 500;
 
 fn random_scene() -> Arc<HittableList> {
     let mut world = HittableList::default();
@@ -41,7 +41,7 @@ fn random_scene() -> Arc<HittableList> {
     world.add(Arc::new(Sphere::new(
         Vec3(0.0, -1000.0, 0.0),
         1000.0,
-        ground_material.clone(),
+        ground_material,
     )));
 
     for a in -11..11 {
@@ -92,14 +92,14 @@ fn random_scene() -> Arc<HittableList> {
         world.add(Arc::new(Sphere::new(Vec3(4.0, 1.0, 0.0), 1.0, material)));
     }
 
-    return Arc::new(world);
+    Arc::new(world)
 }
 
 fn ray_color(r: Ray, world: Arc<dyn Hittable>, depth: u32) -> Color {
     let mut rec = HitRecord::default();
 
     // if we exceed the ray bounce limit, no more light is gathered
-    if depth <= 0 {
+    if depth == 0 {
         return Vec3(0.0, 0.0, 0.0);
     }
 
@@ -133,7 +133,7 @@ fn calculate_single_pixel(
 ) -> Result {
     let mut pixel_color = Vec3(0.0, 0.0, 0.0);
     let mut rng = thread_rng();
-    for _ in 0..samples_per_pixel {
+    for _ in 0..SAMPLES_PER_PIXEL {
         let r1: f64 = rng.gen();
         let r2: f64 = rng.gen();
 
@@ -143,7 +143,7 @@ fn calculate_single_pixel(
         let r = cam.get_ray(u, v);
         pixel_color += ray_color(r, world.clone(), max_depth);
     }
-    return Result(counter, pixel_color);
+    Result(counter, pixel_color)
 }
 
 #[derive(Copy, Clone)]
@@ -161,7 +161,7 @@ fn calculate_all_pixels(
     cam: Camera,
 ) -> Vec<Result> {
     let mut counter: usize = 0;
-    let max_depth = 50;
+    let max_depth = 100;
 
     let n_workers = 16;
     let pool = ThreadPool::new(n_workers);
@@ -210,17 +210,17 @@ fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
     println!("P3\n{} {}\n255\n", img_width, img_height);
 
     for pixel_color in pixels {
-        write_color(&mut std::io::stdout(), pixel_color, samples_per_pixel).unwrap();
+        write_color(&mut std::io::stdout(), pixel_color, SAMPLES_PER_PIXEL).unwrap();
     }
 }
 
 fn main() {
 
-    todo!("Change the parallelization to be on scanline level, not on pixel level");
+   // todo!("Change the parallelization to be on scanline level, not on pixel level");
 
     // image da
     let aspect_ratio = 16.0 / 9.0;
-    let img_width: usize = 800;
+    let img_width: usize = 1200;
     let img_height: usize = (img_width as f64 / aspect_ratio) as usize;
 
     // world
