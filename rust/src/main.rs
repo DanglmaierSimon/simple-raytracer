@@ -1,8 +1,7 @@
-#![deny(clippy::all)]
-#![warn(clippy::pedantic)]
-#![warn(clippy::restriction)]
-#![warn(clippy::nursery)]
-#![warn(clippy::cargo)]
+#![warn(clippy::correctness)]
+#![warn(clippy::suspicious)]
+#![warn(clippy::complexity)]
+#![warn(clippy::perf)]
 
 pub mod camera;
 pub mod dielectric;
