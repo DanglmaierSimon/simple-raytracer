@@ -1,11 +1,5 @@
 use crate::vec3::Color;
-use std::{f64::consts::PI, io::Write};
-
-pub const INFINITY: f64 = std::f64::MAX;
-
-pub fn deg_to_rad(degrees: f64) -> f64 {
-    degrees * PI / 180.0
-}
+use std::io::Write;
 
 pub fn write_color(
     out: &mut impl Write,
