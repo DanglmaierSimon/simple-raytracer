@@ -20,7 +20,7 @@ use std::{
     sync::{mpsc::channel, Arc},
 };
 
-use hittable::{HitRecord, Hittable};
+use hittable::{HitRecord, HitResult, Hittable};
 use material::Material;
 use rand::{thread_rng, Rng};
 use ray::Ray;
@@ -103,13 +103,11 @@ fn ray_color(r: Ray, world: Arc<dyn Hittable>, depth: u32) -> Color {
         return Vec3(0.0, 0.0, 0.0);
     }
 
-    if world.hit(r, 0.001, INFINITY, &mut rec) {
+    if let HitResult::Hit(mat) = world.hit(r, 0.001, INFINITY, &mut rec) {
         let mut scattered = Ray::default();
         let mut attenuation = Color::default();
 
-        let material = rec.mat.clone().unwrap();
-
-        if material.scatter(r, &rec, &mut attenuation, &mut scattered) {
+        if mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
             return attenuation * ray_color(scattered, world, depth - 1);
         } else {
             return Vec3(0.0, 0.0, 0.0);
@@ -215,8 +213,7 @@ fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
 }
 
 fn main() {
-
-   // todo!("Change the parallelization to be on scanline level, not on pixel level");
+    // todo!("Change the parallelization to be on scanline level, not on pixel level");
 
     // image da
     let aspect_ratio = 16.0 / 9.0;

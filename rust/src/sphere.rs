@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    hittable::{HitRecord, Hittable},
+    hittable::{HitRecord, HitResult, Hittable},
     material::Material,
     ray::Ray,
     vec3::{Point3, Vec3},
@@ -32,7 +32,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> HitResult {
         let oc = r.origin() - self.center();
         let a = r.direction().length_squared();
         let half_b = Vec3::dot(oc, r.direction());
@@ -40,7 +40,7 @@ impl Hittable for Sphere {
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
-            return false;
+            return HitResult::Miss;
         }
 
         let sqrtd = discriminant.sqrt();
@@ -50,7 +50,7 @@ impl Hittable for Sphere {
         if root < t_min || t_max < root {
             root = (-half_b + sqrtd) / a;
             if root < t_min || t_max < root {
-                return false;
+                return HitResult::Miss;
             }
         }
 
@@ -59,8 +59,7 @@ impl Hittable for Sphere {
         rec.normal = (rec.p - self.center()) / self.radius();
         let outward_normal = (rec.p - self.center()) / self.radius();
         rec.set_front_face(r, outward_normal);
-        rec.mat = Some(self.mat.clone());
 
-        true
+        HitResult::Hit(self.mat.clone())
     }
 }
