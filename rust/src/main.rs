@@ -1,6 +1,7 @@
 #![warn(clippy::correctness)]
 #![warn(clippy::suspicious)]
 #![warn(clippy::complexity)]
+#![warn(clippy::style)]
 #![warn(clippy::perf)]
 
 pub mod camera;
@@ -32,7 +33,12 @@ use crate::{
     metal::Metal, sphere::Sphere, utils::write_color, vec3::Color,
 };
 
-const SAMPLES_PER_PIXEL: usize = 500;
+#[derive(Debug, Clone)]
+struct ImageData {
+    pub samples_per_pixel: usize,
+    pub image_width: usize,
+    pub image_height: usize,
+}
 
 fn random_scene() -> Arc<HittableList> {
     let mut world = HittableList::default();
@@ -122,26 +128,25 @@ fn ray_color(r: Ray, world: Arc<dyn Hittable>, depth: u32) -> Color {
 fn calculate_single_pixel(
     i: usize,
     j: usize,
-    img_width: usize,
-    img_height: usize,
+    data: &ImageData,
     world: Arc<dyn Hittable>,
     max_depth: u32,
     cam: &Camera,
-    counter: usize,
+    pixel_index: usize,
 ) -> Result {
     let mut pixel_color = Vec3(0.0, 0.0, 0.0);
     let mut rng = thread_rng();
-    for _ in 0..SAMPLES_PER_PIXEL {
+    for _ in 0..data.samples_per_pixel {
         let r1: f64 = rng.gen();
         let r2: f64 = rng.gen();
 
-        let u = (i as f64 + r1) / (img_width - 1) as f64;
-        let v = (j as f64 + r2) / (img_height - 1) as f64;
+        let u = (i as f64 + r1) / (data.image_width - 1) as f64;
+        let v = (j as f64 + r2) / (data.image_height - 1) as f64;
 
         let r = cam.get_ray(u, v);
         pixel_color += ray_color(r, world.clone(), max_depth);
     }
-    Result(counter, pixel_color)
+    Result(pixel_index, pixel_color)
 }
 
 #[derive(Copy, Clone)]
@@ -152,13 +157,8 @@ enum ThreadStatus {
     Finished,
 }
 
-fn calculate_all_pixels(
-    img_width: usize,
-    img_height: usize,
-    world: Arc<dyn Hittable>,
-    cam: Camera,
-) -> Vec<Result> {
-    let mut counter: usize = 0;
+fn calculate_all_pixels(data: ImageData, world: Arc<dyn Hittable>, cam: Camera) -> Vec<Result> {
+    let mut pixel_index: usize = 0;
     let max_depth = 100;
 
     let n_workers = 16;
@@ -167,19 +167,18 @@ fn calculate_all_pixels(
     let (status_tx, status_rx) = channel::<ThreadStatus>();
     let (tx, rx) = channel::<Result>();
 
-    for j in (0..img_height - 1).rev() {
-        for i in 0..img_width {
+    for j in (0..data.image_height - 1).rev() {
+        for i in 0..data.image_width {
             let world = world.clone();
             let cam = cam.clone();
             let tx = tx.clone();
             let status_tx = status_tx.clone();
-            counter += 1;
+            let data = data.clone();
+            pixel_index += 1;
             status_tx.send(ThreadStatus::Started).unwrap();
 
             pool.execute(move || {
-                let px = calculate_single_pixel(
-                    i, j, img_width, img_height, world, max_depth, &cam, counter,
-                );
+                let px = calculate_single_pixel(i, j, &data, world, max_depth, &cam, pixel_index);
 
                 tx.send(px).unwrap();
                 status_tx.send(ThreadStatus::Finished).unwrap();
@@ -204,11 +203,11 @@ fn calculate_all_pixels(
     return rx.iter().collect();
 }
 
-fn write_colors(pixels: Vec<Color>, img_width: usize, img_height: usize) {
-    println!("P3\n{} {}\n255\n", img_width, img_height);
+fn write_colors(pixels: Vec<Color>, data: &ImageData) {
+    println!("P3\n{} {}\n255\n", data.image_width, data.image_height);
 
     for pixel_color in pixels {
-        write_color(&mut std::io::stdout(), pixel_color, SAMPLES_PER_PIXEL).unwrap();
+        write_color(&mut std::io::stdout(), pixel_color, data.samples_per_pixel).unwrap();
     }
 }
 
@@ -218,7 +217,12 @@ fn main() {
     // image da
     let aspect_ratio = 16.0 / 9.0;
     let img_width: usize = 1200;
-    let img_height: usize = (img_width as f64 / aspect_ratio) as usize;
+
+    let image_data = ImageData {
+        samples_per_pixel: 500,
+        image_width: 1200,
+        image_height: (img_width as f64 / aspect_ratio) as usize,
+    };
 
     // world
     let world = random_scene();
@@ -241,13 +245,13 @@ fn main() {
     );
 
     // render
-    let mut pixels = calculate_all_pixels(img_width, img_height, world, cam);
+    let mut pixels = calculate_all_pixels(image_data.clone(), world, cam);
 
     pixels.sort_by(|lhs, rhs| lhs.0.cmp(&rhs.0));
 
     let r: Vec<Color> = pixels.iter().map(|elem| elem.1).collect();
 
-    write_colors(r, img_width, img_height);
+    write_colors(r, &image_data);
 
     eprintln!("\nDone!");
 }
