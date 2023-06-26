@@ -23,7 +23,7 @@ use std::{
 
 use hittable::{HitRecord, HitResult, Hittable};
 use material::Material;
-use rand::{thread_rng, Rng};
+use rand::{rngs::ThreadRng, thread_rng, Rng};
 use ray::Ray;
 use threadpool::ThreadPool;
 use vec3::Vec3;
@@ -125,6 +125,34 @@ fn ray_color(r: Ray, world: Arc<dyn Hittable>, depth: u32) -> Color {
     (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0)
 }
 
+struct ImageLine {
+    pub idx: usize,       // y-coordinate
+    pub line: Vec<Color>, // image width
+}
+
+fn calculate_single_image_line(
+    line_idx: usize,
+    data: &ImageData,
+    world: Arc<dyn Hittable>,
+    max_depth: u32,
+    cam: &Camera,
+) -> ImageLine {
+    let mut rng = thread_rng();
+    let mut res = Vec::with_capacity(data.image_width);
+
+    for i in 0..data.image_width {
+        res.insert(
+            i,
+            calculate_single_pixel(i, line_idx, data, world.clone(), max_depth, cam, &mut rng),
+        );
+    }
+
+    ImageLine {
+        idx: line_idx,
+        line: res,
+    }
+}
+
 fn calculate_single_pixel(
     i: usize,
     j: usize,
@@ -132,10 +160,9 @@ fn calculate_single_pixel(
     world: Arc<dyn Hittable>,
     max_depth: u32,
     cam: &Camera,
-    pixel_index: usize,
-) -> Result {
+    rng: &mut ThreadRng,
+) -> Color {
     let mut pixel_color = Vec3(0.0, 0.0, 0.0);
-    let mut rng = thread_rng();
     for _ in 0..data.samples_per_pixel {
         let r1: f64 = rng.gen();
         let r2: f64 = rng.gen();
@@ -146,57 +173,58 @@ fn calculate_single_pixel(
         let r = cam.get_ray(u, v);
         pixel_color += ray_color(r, world.clone(), max_depth);
     }
-    Result(pixel_index, pixel_color)
-}
 
-#[derive(Copy, Clone)]
-struct Result(pub usize, pub Color);
+    pixel_color
+}
 
 enum ThreadStatus {
     Started,
     Finished,
 }
 
-fn calculate_all_pixels(data: ImageData, world: Arc<dyn Hittable>, cam: Camera) -> Vec<Result> {
-    let mut pixel_index: usize = 0;
-    let max_depth = 100;
+fn calculate_all_pixels(
+    data: &ImageData,
+    world: Arc<dyn Hittable>,
+    cam: &Camera,
+) -> Vec<ImageLine> {
+    let max_depth: u32 = 100;
 
     let n_workers = 16;
-    let pool = ThreadPool::new(n_workers);
 
     let (status_tx, status_rx) = channel::<ThreadStatus>();
-    let (tx, rx) = channel::<Result>();
+    let (tx, rx) = channel::<ImageLine>();
 
-    for j in (0..data.image_height - 1).rev() {
-        for i in 0..data.image_width {
-            let world = world.clone();
-            let cam = cam.clone();
-            let tx = tx.clone();
-            let status_tx = status_tx.clone();
-            let data = data.clone();
-            pixel_index += 1;
-            status_tx.send(ThreadStatus::Started).unwrap();
+    let pool = ThreadPool::new(n_workers);
+    eprintln!("creating jobs for pool");
+    for j in 0..data.image_height - 1 {
+        let world = world.clone();
+        let cam = cam.clone();
+        let tx = tx.clone();
+        let status_tx = status_tx.clone();
+        let data = data.clone();
+        status_tx.send(ThreadStatus::Started).unwrap();
 
-            pool.execute(move || {
-                let px = calculate_single_pixel(i, j, &data, world, max_depth, &cam, pixel_index);
+        pool.execute(move || {
+            let il: ImageLine = calculate_single_image_line(j, &data, world, max_depth, &cam);
 
-                tx.send(px).unwrap();
-                status_tx.send(ThreadStatus::Finished).unwrap();
-            });
-        }
+            tx.send(il).unwrap();
+            status_tx.send(ThreadStatus::Finished).unwrap();
+        });
     }
+    eprintln!("done creating jobs");
 
+    // drop to not have a deadlock
     drop(tx);
     drop(status_tx);
 
-    let mut remaining_pixels = 0;
+    let mut remaining_lines = 0;
 
     status_rx.iter().for_each(|v| {
         match v {
-            ThreadStatus::Started => remaining_pixels += 1,
-            ThreadStatus::Finished => remaining_pixels -= 1,
+            ThreadStatus::Started => remaining_lines += 1,
+            ThreadStatus::Finished => remaining_lines -= 1,
         };
-        eprint!("\rPixels remaining: {:0>8}", remaining_pixels);
+        eprint!("\rLines remaining: {:0>5}", remaining_lines);
         std::io::stderr().flush().unwrap();
     });
 
@@ -212,15 +240,13 @@ fn write_colors(pixels: Vec<Color>, data: &ImageData) {
 }
 
 fn main() {
-    // todo!("Change the parallelization to be on scanline level, not on pixel level");
-
-    // image da
+    // image data
     let aspect_ratio = 16.0 / 9.0;
     let img_width: usize = 1200;
 
     let image_data = ImageData {
         samples_per_pixel: 500,
-        image_width: 1200,
+        image_width: img_width,
         image_height: (img_width as f64 / aspect_ratio) as usize,
     };
 
@@ -245,13 +271,16 @@ fn main() {
     );
 
     // render
-    let mut pixels = calculate_all_pixels(image_data.clone(), world, cam);
+    let mut image_lines = calculate_all_pixels(&image_data, world, &cam);
 
-    pixels.sort_by(|lhs, rhs| lhs.0.cmp(&rhs.0));
+    image_lines.sort_by(|lhs, rhs| lhs.idx.cmp(&rhs.idx));
+    image_lines.reverse();
 
-    let r: Vec<Color> = pixels.iter().map(|elem| elem.1).collect();
+    let r: Vec<Vec<Color>> = image_lines.iter().map(|elem| elem.line.clone()).collect();
 
-    write_colors(r, &image_data);
+    let final_r = r.into_iter().flatten().collect();
+
+    write_colors(final_r, &image_data);
 
     eprintln!("\nDone!");
 }
