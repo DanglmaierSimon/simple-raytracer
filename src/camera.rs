@@ -1,5 +1,6 @@
 use crate::{
     ray::Ray,
+    utils::random_in_range,
     vec3::{Point3, Vec3},
 };
 
@@ -13,6 +14,8 @@ pub struct Camera {
     v: Vec3,
     // w: Vec3,
     lens_radius: f64,
+    time_0: f64,
+    time_1: f64,
 }
 
 impl Camera {
@@ -24,6 +27,8 @@ impl Camera {
         aspect_ratio: f64,
         aperture: f64,
         focus_dist: f64,
+        time_0: f64, // shutter open time
+        time_1: f64, // shutter close time
     ) -> Self {
         let theta = vfov.to_radians();
         let h = (theta / 2.0).tan();
@@ -49,6 +54,8 @@ impl Camera {
             v,
             u,
             lens_radius,
+            time_0,
+            time_1,
         }
     }
 
@@ -59,6 +66,7 @@ impl Camera {
         Ray::new(
             self.origin + offset,
             self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,
+            random_in_range(self.time_0, self.time_1),
         )
     }
 }

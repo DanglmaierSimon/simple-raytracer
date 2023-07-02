@@ -46,6 +46,8 @@ impl Renderer {
             aspect_ratio,
             aperture,
             dist_to_focus,
+            0.0,
+            1.0,
         );
 
         // render

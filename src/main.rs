@@ -4,24 +4,27 @@
 #![warn(clippy::style)]
 #![warn(clippy::perf)]
 
-pub mod camera;
-pub mod dielectric;
-pub mod hittable;
-pub mod lambertian;
-pub mod material;
-pub mod metal;
-pub mod ppm_image;
-pub mod ray;
-pub mod renderer;
-pub mod sphere;
-pub mod utils;
-pub mod vec3;
+mod camera;
+mod dielectric;
+mod hittable;
+mod lambertian;
+mod material;
+mod metal;
+mod moving_sphere;
+mod ppm_image;
+mod ray;
+mod renderer;
+mod sphere;
+mod utils;
+mod vec3;
 
 use std::sync::Arc;
 
 use material::Material;
 
+use moving_sphere::MovingSphere;
 use rand::{thread_rng, Rng};
+use utils::random_in_range;
 use vec3::Vec3;
 
 use crate::{
@@ -56,7 +59,17 @@ fn random_scene() -> HittableList {
                     // diffuse
                     let albedo = Color::random_vec() * Color::random_vec();
                     sphere_material = Arc::new(Lambertian::new(albedo));
-                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material.clone())));
+
+                    let center2 = center + Vec3(0.0, random_in_range(0.0, 0.5), 0.0);
+                    world.add(Arc::new(MovingSphere::new(
+                        center,
+                        center2,
+                        0.0,
+                        1.0,
+                        0.2,
+                        sphere_material,
+                    )))
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random(0.5, 1.0);
@@ -92,8 +105,10 @@ fn random_scene() -> HittableList {
 
 fn main() {
     // image data
-    let aspect_ratio = 3.0 / 2.0;
-    let image_width: usize = 1200;
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width: usize = 400;
+    let samples_per_pixel = 100;
+    let max_depth = 50;
 
     let image_height = (image_width as f64 / aspect_ratio) as usize;
 
@@ -103,7 +118,7 @@ fn main() {
     let world = random_scene();
     let renderer = Renderer::new(world, image);
 
-    let result = renderer.render(100, 50, aspect_ratio);
+    let result = renderer.render(samples_per_pixel, max_depth, aspect_ratio);
 
     // TODO: Pass image name via command line
     let output_file = std::fs::File::create("image.ppm").unwrap();
