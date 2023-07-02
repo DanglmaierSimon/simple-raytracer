@@ -178,6 +178,7 @@ fn calculate_single_pixel(
 }
 
 enum ThreadStatus {
+    Queued,
     Started,
     Finished,
 }
@@ -202,9 +203,10 @@ fn calculate_all_pixels(
         let tx = tx.clone();
         let status_tx = status_tx.clone();
         let data = data.clone();
-        status_tx.send(ThreadStatus::Started).unwrap();
+        status_tx.send(ThreadStatus::Queued).unwrap();
 
         pool.execute(move || {
+            status_tx.send(ThreadStatus::Started).unwrap();
             let il: ImageLine = calculate_single_image_line(j, &data, world, max_depth, &cam);
 
             tx.send(il).unwrap();
@@ -217,14 +219,26 @@ fn calculate_all_pixels(
     drop(tx);
     drop(status_tx);
 
-    let mut remaining_lines = 0;
+    let mut remaining_jobs = 0;
+    let mut running_jobs = 0;
+    let mut finished_jobs = 0;
 
     status_rx.iter().for_each(|v| {
         match v {
-            ThreadStatus::Started => remaining_lines += 1,
-            ThreadStatus::Finished => remaining_lines -= 1,
+            ThreadStatus::Queued => remaining_jobs += 1,
+            ThreadStatus::Started => {
+                remaining_jobs -= 1;
+                running_jobs += 1
+            }
+            ThreadStatus::Finished => {
+                running_jobs -= 1;
+                finished_jobs += 1
+            }
         };
-        eprint!("\rLines remaining: {:0>5}", remaining_lines);
+        eprint!(
+            "\rJobs remaining/running/finished: {:0>5}/{:0>5}/{:0>5}",
+            remaining_jobs, running_jobs, finished_jobs
+        );
         std::io::stderr().flush().unwrap();
     });
 
